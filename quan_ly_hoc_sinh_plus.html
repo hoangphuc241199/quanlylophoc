@@ -1,0 +1,3745 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QUẢN LÝ HỌC SINH</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+  <style>
+    /* =========================
+       Biến giao diện và reset
+       ========================= */
+    :root {
+      color-scheme: light;
+      --bg: #f4f7fb;
+      --surface: #ffffff;
+      --surface-2: #eef4fb;
+      --text: #172033;
+      --muted: #66738a;
+      --line: #dbe4f0;
+      --primary: #1769e0;
+      --primary-strong: #0f56ba;
+      --accent: #00a18f;
+      --warning: #f5b400;
+      --danger: #df3f40;
+      --success: #16855f;
+      --shadow: 0 18px 45px rgba(23, 32, 51, 0.12);
+      --soft-shadow: 0 10px 24px rgba(23, 32, 51, 0.08);
+      --radius: 8px;
+      --transition: 180ms ease;
+    }
+
+    body.dark {
+      color-scheme: dark;
+      --bg: #101723;
+      --surface: #172033;
+      --surface-2: #202b3f;
+      --text: #eef4ff;
+      --muted: #aeb9cb;
+      --line: #2d3b52;
+      --primary: #5b9bff;
+      --primary-strong: #87b7ff;
+      --accent: #37ccb7;
+      --warning: #ffd166;
+      --danger: #ff6b6b;
+      --success: #57d39c;
+      --shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+      --soft-shadow: 0 10px 24px rgba(0, 0, 0, 0.24);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        linear-gradient(180deg, rgba(23, 105, 224, 0.08), transparent 340px),
+        var(--bg);
+      color: var(--text);
+      transition: background var(--transition), color var(--transition);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.58;
+    }
+
+    .app-shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 42px;
+    }
+
+    /* =========================
+       Header, tìm kiếm, thống kê
+       ========================= */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .brand-icon {
+      display: grid;
+      place-items: center;
+      width: 54px;
+      height: 54px;
+      border-radius: var(--radius);
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: var(--soft-shadow);
+      flex: 0 0 auto;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(1.55rem, 3vw, 2.45rem);
+      line-height: 1.08;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .date-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 0.94rem;
+      font-weight: 500;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 0 0 min(520px, 48%);
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .search-box i {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    .search-box input,
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+    }
+
+    .search-box input {
+      padding: 0 14px 0 42px;
+    }
+
+    .field input,
+    .field select {
+      padding: 0 13px;
+    }
+
+    .field textarea {
+      min-height: 190px;
+      padding: 13px;
+      line-height: 1.5;
+      resize: vertical;
+    }
+
+    .search-box input:focus,
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(23, 105, 224, 0.13);
+    }
+
+    .icon-btn {
+      display: inline-grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      transition: transform var(--transition), border-color var(--transition), background var(--transition);
+    }
+
+    .icon-btn:hover,
+    .ghost-btn:hover,
+    .action-card:hover {
+      transform: translateY(-2px);
+      border-color: color-mix(in srgb, var(--primary) 48%, var(--line));
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .stat-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 94px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--soft-shadow);
+    }
+
+    .stat-icon {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius);
+      color: #ffffff;
+      background: var(--primary);
+      flex: 0 0 auto;
+    }
+
+    .stat-icon.green {
+      background: var(--accent);
+    }
+
+    .stat-icon.yellow {
+      background: #d89200;
+    }
+
+    .stat-icon.red {
+      background: var(--danger);
+    }
+
+    .stat-label {
+      margin: 0 0 4px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 600;
+    }
+
+    .stat-value {
+      margin: 0;
+      font-size: 1.6rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .backup-alert {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 18px;
+      padding: 15px 16px;
+      border: 1px solid rgba(245, 180, 0, 0.38);
+      border-left: 5px solid var(--warning);
+      border-radius: var(--radius);
+      background: rgba(245, 180, 0, 0.12);
+      box-shadow: var(--soft-shadow);
+    }
+
+    .backup-alert strong {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+
+    .backup-alert p {
+      margin: 0;
+      color: var(--muted);
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .backup-time {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 32px;
+      padding: 0 11px;
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 0.86rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    /* =========================
+       Layout chính và card menu
+       ========================= */
+    main {
+      display: block;
+    }
+
+    .view {
+      display: none;
+      animation: fadeSlide 240ms ease both;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    @keyframes fadeSlide {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .action-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-height: 102px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: var(--soft-shadow);
+      text-align: left;
+      transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition), background var(--transition);
+    }
+
+    .action-card:hover {
+      box-shadow: var(--shadow);
+    }
+
+    .action-card .card-icon {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius);
+      background: var(--surface-2);
+      color: var(--primary);
+      flex: 0 0 auto;
+    }
+
+    .action-card strong {
+      display: block;
+      font-size: 1rem;
+      line-height: 1.25;
+    }
+
+    .action-card small {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-weight: 500;
+      line-height: 1.35;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--soft-shadow);
+      overflow: hidden;
+    }
+
+    .panel + .panel {
+      margin-top: 14px;
+    }
+
+    .panel-head,
+    .view-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .view-head {
+      margin-bottom: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--soft-shadow);
+    }
+
+    .panel-head h2,
+    .view-head h2 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0;
+      font-size: 1.1rem;
+      line-height: 1.25;
+    }
+
+    .panel-body {
+      padding: 18px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .badge.due {
+      background: rgba(245, 180, 0, 0.15);
+      color: #a36f00;
+    }
+
+    .badge.over {
+      background: rgba(223, 63, 64, 0.14);
+      color: var(--danger);
+    }
+
+    .badge.ok {
+      background: rgba(22, 133, 95, 0.14);
+      color: var(--success);
+    }
+
+    .badge.near {
+      background: rgba(245, 180, 0, 0.15);
+      color: #a36f00;
+    }
+
+    .badge.muted {
+      background: var(--surface-2);
+      color: var(--muted);
+    }
+
+    .ghost-btn,
+    .primary-btn,
+    .danger-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 44px;
+      padding: 0 15px;
+      border-radius: var(--radius);
+      font-weight: 700;
+      transition: transform var(--transition), border-color var(--transition), background var(--transition);
+      white-space: nowrap;
+    }
+
+    .ghost-btn {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    .primary-btn {
+      border: 1px solid var(--primary);
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    .primary-btn:hover {
+      background: var(--primary-strong);
+    }
+
+    .danger-btn {
+      border: 1px solid var(--danger);
+      background: var(--danger);
+      color: #ffffff;
+    }
+
+    .mini-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .mini-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 34px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 0.82rem;
+      font-weight: 800;
+      transition: transform var(--transition), border-color var(--transition), background var(--transition);
+      white-space: nowrap;
+    }
+
+    .mini-btn:hover {
+      transform: translateY(-1px);
+      border-color: color-mix(in srgb, var(--primary) 48%, var(--line));
+    }
+
+    .mini-btn.danger {
+      border-color: rgba(223, 63, 64, 0.3);
+      color: var(--danger);
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-color: color-mix(in srgb, var(--primary) 42%, var(--line)) transparent;
+      scrollbar-width: thin;
+    }
+
+    .table-wrap::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .table-wrap::-webkit-scrollbar-thumb {
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--primary) 38%, var(--line));
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 640px;
+    }
+
+    th,
+    td {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      background: var(--surface-2);
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .student-name {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+    }
+
+    .avatar {
+      display: inline-grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #ffffff;
+      font-size: 0.82rem;
+      font-weight: 800;
+      flex: 0 0 auto;
+    }
+
+    .empty-state {
+      padding: 28px 18px;
+      color: var(--muted);
+      text-align: center;
+      font-weight: 600;
+    }
+
+    /* =========================
+       Form, checklist, học phí
+       ========================= */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      align-items: end;
+    }
+
+    .form-grid.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .form-grid.four {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field label {
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .form-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-grid {
+      display: grid;
+      grid-template-columns: 1.4fr minmax(180px, 0.7fr);
+      gap: 12px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+
+    .choice-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .choice-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 74px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-2);
+      color: var(--text);
+      text-align: left;
+      transition: transform var(--transition), border-color var(--transition), background var(--transition);
+    }
+
+    .choice-btn:hover {
+      transform: translateY(-1px);
+      border-color: color-mix(in srgb, var(--primary) 48%, var(--line));
+      background: var(--surface);
+    }
+
+    .choice-btn i {
+      color: var(--primary);
+    }
+
+    .choice-btn strong,
+    .choice-btn small {
+      display: block;
+    }
+
+    .choice-btn small {
+      margin-top: 3px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .check-toolbar {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .check-toolbar .field {
+      width: min(280px, 100%);
+    }
+
+    .checklist {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 58px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-2);
+      transition: border-color var(--transition), transform var(--transition), background var(--transition);
+    }
+
+    .check-item:hover {
+      transform: translateY(-1px);
+      border-color: color-mix(in srgb, var(--primary) 45%, var(--line));
+    }
+
+    .check-item input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary);
+      flex: 0 0 auto;
+    }
+
+    .check-item span {
+      display: block;
+      min-width: 0;
+    }
+
+    .check-item strong {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .check-item small {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .summary-box {
+      margin-top: 14px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-2);
+      color: var(--muted);
+      font-weight: 700;
+      line-height: 1.55;
+    }
+
+    .summary-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .summary-metric {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+
+    .summary-metric span {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    .summary-metric strong {
+      display: block;
+      color: var(--text);
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    .summary-note {
+      margin-top: 12px;
+    }
+
+    .money-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .money-card {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-2);
+    }
+
+    .money-card span {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 800;
+    }
+
+    .money-card strong {
+      display: block;
+      font-size: 1.45rem;
+      line-height: 1;
+    }
+
+    .sync-note {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-2);
+      color: var(--muted);
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .date-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      min-width: 180px;
+    }
+
+    .date-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 9px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      color: var(--text);
+      font-size: 0.82rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .modal-field {
+      display: grid;
+      gap: 8px;
+      color: var(--text);
+    }
+
+    .modal-field label {
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+
+    .modal-field input {
+      min-height: 46px;
+      padding: 0 13px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      outline: none;
+    }
+
+    .fee-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .fee-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-left: 5px solid var(--warning);
+      border-radius: var(--radius);
+      background: var(--surface-2);
+    }
+
+    .fee-card.over {
+      border-left-color: var(--danger);
+    }
+
+    .fee-card h3 {
+      margin: 0 0 5px;
+      font-size: 1rem;
+    }
+
+    .fee-card p {
+      margin: 0;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    /* =========================
+       Modal và toast
+       ========================= */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: rgba(11, 18, 32, 0.52);
+      backdrop-filter: blur(6px);
+      animation: fadeIn 180ms ease both;
+    }
+
+    .modal-overlay[hidden] {
+      display: none;
+    }
+
+    .modal {
+      width: min(460px, 100%);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      animation: popIn 200ms ease both;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      font-size: 1.08rem;
+    }
+
+    .modal-body {
+      padding: 18px;
+      color: var(--muted);
+      font-weight: 600;
+      line-height: 1.55;
+      white-space: pre-line;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 0 18px 18px;
+      flex-wrap: wrap;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes popIn {
+      from {
+        opacity: 0;
+        transform: scale(0.96) translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .toast-region {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 50;
+      display: grid;
+      gap: 10px;
+      width: min(360px, calc(100% - 36px));
+    }
+
+    .toast {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: var(--shadow);
+      font-weight: 700;
+      animation: toastIn 220ms ease both;
+    }
+
+    .loading-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 80;
+      width: 100%;
+      height: 3px;
+      pointer-events: none;
+      opacity: 0;
+      background: linear-gradient(90deg, transparent, var(--primary), var(--accent), transparent);
+      transform: translateX(-100%);
+    }
+
+    body.loading .loading-bar {
+      opacity: 1;
+      animation: loadingSweep 900ms ease-in-out infinite;
+    }
+
+    .toast.success i {
+      color: var(--success);
+    }
+
+    .toast.error i {
+      color: var(--danger);
+    }
+
+    @keyframes toastIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes loadingSweep {
+      from {
+        transform: translateX(-100%);
+      }
+      to {
+        transform: translateX(100%);
+      }
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* =========================
+       Responsive
+       ========================= */
+    @media (max-width: 980px) {
+      .stats-grid,
+      .action-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .checklist,
+      .fee-list,
+      .summary-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 720px) {
+      .app-shell {
+        width: min(100% - 20px, 1180px);
+        padding-top: 18px;
+      }
+
+      .topbar,
+      .top-actions,
+      .panel-head,
+      .view-head,
+      .check-toolbar,
+      .backup-alert {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .top-actions {
+        flex-basis: auto;
+        width: 100%;
+      }
+
+      .top-actions {
+        display: grid;
+        grid-template-columns: 1fr 46px;
+      }
+
+      .stats-grid,
+      .action-grid,
+      .checklist,
+      .fee-list,
+      .form-grid,
+      .form-grid.three,
+      .form-grid.four,
+      .toolbar-grid,
+      .money-grid,
+      .summary-metrics {
+        grid-template-columns: 1fr;
+      }
+
+      .action-card {
+        min-height: 88px;
+      }
+
+      .panel-head,
+      .view-head,
+      .panel-body {
+        padding: 14px;
+      }
+
+      .check-toolbar .field {
+        width: 100%;
+      }
+
+      .form-actions,
+      .modal-actions {
+        justify-content: stretch;
+      }
+
+      .form-actions button,
+      .modal-actions button {
+        width: 100%;
+      }
+
+      .choice-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="loading-bar" aria-hidden="true"></div>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">
+          <i class="fa-solid fa-graduation-cap fa-lg"></i>
+        </div>
+        <div>
+          <h1>QUẢN LÝ HỌC SINH</h1>
+          <span class="date-label"><i class="fa-regular fa-calendar"></i><span id="todayLabel"></span></span>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <label class="search-box" for="globalSearch">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input id="globalSearch" type="search" placeholder="Tìm kiếm học sinh..." autocomplete="off" />
+        </label>
+        <button class="icon-btn" id="quickDarkToggle" type="button" title="Dark Mode" aria-label="Dark Mode">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+      </div>
+    </header>
+
+    <section class="stats-grid" aria-label="Thống kê">
+      <article class="stat-card">
+        <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+        <div>
+          <p class="stat-label">Tổng học sinh</p>
+          <p class="stat-value" id="totalStudents">0</p>
+        </div>
+      </article>
+      <article class="stat-card">
+        <div class="stat-icon green"><i class="fa-solid fa-list-check"></i></div>
+        <div>
+          <p class="stat-label">Tổng buổi hiện tại</p>
+          <p class="stat-value" id="totalSessions">0</p>
+        </div>
+      </article>
+      <article class="stat-card">
+        <div class="stat-icon yellow"><i class="fa-solid fa-coins"></i></div>
+        <div>
+          <p class="stat-label">Sắp đến hạn học phí</p>
+          <p class="stat-value" id="dueStudents">0</p>
+        </div>
+      </article>
+      <article class="stat-card">
+        <div class="stat-icon red"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <div>
+          <p class="stat-label">Học sinh học vượt</p>
+          <p class="stat-value" id="totalSubjects">0</p>
+        </div>
+      </article>
+    </section>
+
+    <main>
+      <section class="view active" id="view-home" aria-labelledby="homeTitle">
+        <div class="action-grid" aria-label="Chức năng chính">
+          <button class="action-card" type="button" data-view="attendance">
+            <span class="card-icon"><i class="fa-solid fa-clipboard-check"></i></span>
+            <span><strong>Điểm danh</strong><small>Ghi nhận buổi học</small></span>
+          </button>
+          <button class="action-card" type="button" data-view="payment">
+            <span class="card-icon"><i class="fa-solid fa-money-check-dollar"></i></span>
+            <span><strong>Thanh toán</strong><small>Trừ các buổi cũ nhất</small></span>
+          </button>
+          <button class="action-card" type="button" data-view="fees">
+            <span class="card-icon"><i class="fa-solid fa-chart-line"></i></span>
+            <span><strong>Theo dõi học phí</strong><small>Theo chuẩn từng học sinh</small></span>
+          </button>
+          <button class="action-card" type="button" data-view="manage">
+            <span class="card-icon"><i class="fa-solid fa-user-gear"></i></span>
+            <span><strong>Quản lý học sinh</strong><small>Sửa thông tin và xoá</small></span>
+          </button>
+          <button class="action-card" type="button" data-view="progress">
+            <span class="card-icon"><i class="fa-solid fa-timeline"></i></span>
+            <span><strong>Theo dõi tiến trình học</strong><small>Lịch sử ngày học thật</small></span>
+          </button>
+          <button class="action-card" type="button" data-view="finance">
+            <span class="card-icon"><i class="fa-solid fa-wallet"></i></span>
+            <span><strong>Quản lý chi tiêu</strong><small>Thu, chi và tiền lời</small></span>
+          </button>
+          <button class="action-card" type="button" data-view="add">
+            <span class="card-icon"><i class="fa-solid fa-user-plus"></i></span>
+            <span><strong>Thêm học sinh</strong><small>Tên và bộ môn</small></span>
+          </button>
+          <button class="action-card" type="button" id="syncSheetBtn">
+            <span class="card-icon"><i class="fa-solid fa-cloud-arrow-up"></i></span>
+            <span><strong>Đồng bộ ngay</strong><small>Tự lưu lên Sheet mỗi 5 giây</small></span>
+          </button>
+          <button class="action-card" type="button" id="exportExcelBtn">
+            <span class="card-icon"><i class="fa-solid fa-file-export"></i></span>
+            <span><strong>Export Excel</strong><small>Tải file .xlsx</small></span>
+          </button>
+          <button class="action-card" type="button" id="importExcelBtn">
+            <span class="card-icon"><i class="fa-solid fa-file-import"></i></span>
+            <span><strong>Import Excel</strong><small>Nạp dữ liệu từ .xlsx</small></span>
+          </button>
+          <button class="action-card" type="button" id="exportJsonBtn">
+            <span class="card-icon"><i class="fa-solid fa-shield-halved"></i></span>
+            <span><strong>Export Backup JSON</strong><small>Sao lưu toàn bộ dữ liệu</small></span>
+          </button>
+          <button class="action-card" type="button" id="importJsonBtn">
+            <span class="card-icon"><i class="fa-solid fa-file-shield"></i></span>
+            <span><strong>Import Backup JSON</strong><small>Khôi phục từ file backup</small></span>
+          </button>
+          <button class="action-card" type="button" id="restoreBackupBtn">
+            <span class="card-icon"><i class="fa-solid fa-clock-rotate-left"></i></span>
+            <span><strong>Khôi phục dữ liệu gần nhất</strong><small>Dùng bản auto backup</small></span>
+          </button>
+          <button class="action-card" type="button" id="themeCardBtn">
+            <span class="card-icon"><i class="fa-solid fa-circle-half-stroke"></i></span>
+            <span><strong>Dark Mode</strong><small>Bật/tắt giao diện tối</small></span>
+          </button>
+          <button class="action-card" type="button" data-view="home">
+            <span class="card-icon"><i class="fa-solid fa-house"></i></span>
+            <span><strong>Quay về trang chủ</strong><small>Dashboard chính</small></span>
+          </button>
+        </div>
+
+        <article class="backup-alert" aria-label="Cảnh báo dữ liệu">
+          <div>
+            <strong><i class="fa-solid fa-triangle-exclamation"></i> Nên export dữ liệu định kỳ để tránh mất dữ liệu.</strong>
+            <p>Dữ liệu vẫn được lưu tự động trên trình duyệt này, nhưng file JSON giúp khôi phục khi localStorage bị xoá.</p>
+          </div>
+          <span class="backup-time" id="lastBackupLabel"><i class="fa-solid fa-clock"></i> Backup gần nhất: Chưa có</span>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <h2 id="homeTitle"><i class="fa-solid fa-address-book"></i> Danh sách học sinh</h2>
+            <span class="badge" id="visibleCount">0 học sinh</span>
+          </div>
+          <div class="table-wrap">
+            <table aria-label="Danh sách học sinh">
+              <thead>
+                <tr>
+                  <th>Tên học sinh</th>
+                  <th>Bộ môn</th>
+                  <th>Số buổi</th>
+                  <th>Chuẩn</th>
+                  <th>Trạng thái</th>
+                </tr>
+              </thead>
+              <tbody id="studentTableBody"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section class="view" id="view-attendance" aria-labelledby="attendanceTitle">
+        <div class="view-head">
+          <h2 id="attendanceTitle"><i class="fa-solid fa-clipboard-check"></i> Điểm danh</h2>
+          <button class="ghost-btn" type="button" data-view="home"><i class="fa-solid fa-house"></i> Quay về trang chủ</button>
+        </div>
+
+        <article class="panel">
+          <div class="panel-body">
+            <div class="check-toolbar">
+              <div class="field">
+                <label for="attendanceDate">Ngày điểm danh</label>
+                <input id="attendanceDate" type="date" />
+              </div>
+              <button class="ghost-btn" type="button" id="selectAllAttendance"><i class="fa-solid fa-check-double"></i> Chọn tất cả</button>
+            </div>
+
+            <div class="toolbar-grid">
+              <label class="search-box" for="attendanceSearch">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input id="attendanceSearch" type="search" placeholder="Tìm học sinh để điểm danh..." autocomplete="off" />
+              </label>
+              <div class="field">
+                <label for="attendanceSubjectFilter">Lọc theo bộ môn</label>
+                <select id="attendanceSubjectFilter">
+                  <option value="">Tất cả bộ môn</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="checklist" id="attendanceList"></div>
+
+            <div class="form-actions">
+              <button class="primary-btn" type="button" id="markAttendanceBtn"><i class="fa-solid fa-clipboard-check"></i> Điểm danh</button>
+              <button class="danger-btn" type="button" id="rollbackAttendanceBtn"><i class="fa-solid fa-rotate-left"></i> Lùi buổi</button>
+              <button class="ghost-btn" type="button" id="attendanceSyncBtn"><i class="fa-solid fa-cloud-arrow-up"></i> Đồng bộ Sheet</button>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="view" id="view-payment" aria-labelledby="paymentTitle">
+        <div class="view-head">
+          <h2 id="paymentTitle"><i class="fa-solid fa-money-check-dollar"></i> Thanh toán</h2>
+          <button class="ghost-btn" type="button" data-view="home"><i class="fa-solid fa-house"></i> Quay về trang chủ</button>
+        </div>
+
+        <article class="panel">
+          <div class="panel-body">
+            <div class="form-grid four">
+              <div class="field">
+                <label for="paymentStudent">Chọn học sinh</label>
+                <select id="paymentStudent">
+                  <option value="">Chọn học sinh</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="paymentCount">Số buổi cần thanh toán</label>
+                <input id="paymentCount" type="number" min="1" step="1" placeholder="Ví dụ: 4" />
+              </div>
+              <div class="field">
+                <label for="paymentAmount">Số tiền học sinh trả</label>
+                <input id="paymentAmount" type="number" min="0" step="1000" placeholder="Ví dụ: 1200000" />
+              </div>
+              <button class="primary-btn" type="button" id="payBtn"><i class="fa-solid fa-receipt"></i> Thanh toán</button>
+            </div>
+            <div class="summary-box" id="paymentPreview">Chưa chọn học sinh.</div>
+          </div>
+        </article>
+      </section>
+
+      <section class="view" id="view-fees" aria-labelledby="feesTitle">
+        <div class="view-head">
+          <h2 id="feesTitle"><i class="fa-solid fa-chart-line"></i> Theo dõi học phí</h2>
+          <button class="ghost-btn" type="button" data-view="home"><i class="fa-solid fa-house"></i> Quay về trang chủ</button>
+        </div>
+
+        <article class="panel">
+          <div class="panel-body">
+            <div class="fee-list" id="feeList"></div>
+          </div>
+        </article>
+      </section>
+
+      <section class="view" id="view-manage" aria-labelledby="manageTitle">
+        <div class="view-head">
+          <h2 id="manageTitle"><i class="fa-solid fa-user-gear"></i> Quản lý học sinh</h2>
+          <button class="ghost-btn" type="button" data-view="home"><i class="fa-solid fa-house"></i> Quay về trang chủ</button>
+        </div>
+
+        <article class="panel">
+          <div class="panel-body">
+            <div class="toolbar-grid">
+              <label class="search-box" for="managerSearch">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input id="managerSearch" type="search" placeholder="Tìm học sinh trong danh sách..." autocomplete="off" />
+              </label>
+              <div class="field">
+                <label for="subjectFilter">Lọc theo bộ môn</label>
+                <select id="subjectFilter">
+                  <option value="">Tất cả bộ môn</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table aria-label="Quản lý học sinh">
+                <thead>
+                  <tr>
+                    <th>Tên học sinh</th>
+                    <th>Bộ môn</th>
+                    <th>Tổng buổi</th>
+                    <th>Số buổi tiêu chuẩn</th>
+                    <th>Trạng thái học phí</th>
+                    <th>Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody id="managerTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="view" id="view-progress" aria-labelledby="progressTitle">
+        <div class="view-head">
+          <h2 id="progressTitle"><i class="fa-solid fa-timeline"></i> Theo dõi tiến trình học</h2>
+          <button class="ghost-btn" type="button" data-view="home"><i class="fa-solid fa-house"></i> Quay về trang chủ</button>
+        </div>
+
+        <article class="panel">
+          <div class="panel-head">
+            <h2><i class="fa-solid fa-table"></i> Lịch sử ngày học</h2>
+            <span class="badge muted" id="progressCount">0 học sinh</span>
+          </div>
+          <div class="table-wrap">
+            <table aria-label="Theo dõi tiến trình học">
+              <thead id="progressTableHead"></thead>
+              <tbody id="progressTableBody"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section class="view" id="view-finance" aria-labelledby="financeTitle">
+        <div class="view-head">
+          <h2 id="financeTitle"><i class="fa-solid fa-wallet"></i> Quản lý chi tiêu</h2>
+          <button class="ghost-btn" type="button" data-view="home"><i class="fa-solid fa-house"></i> Quay về trang chủ</button>
+        </div>
+
+        <article class="panel">
+          <div class="panel-body">
+            <div class="money-grid">
+              <div class="money-card"><span>Tổng thu</span><strong id="totalIncome">0 đ</strong></div>
+              <div class="money-card"><span>Tổng chi</span><strong id="totalExpense">0 đ</strong></div>
+              <div class="money-card"><span>Tiền lời</span><strong id="netProfit">0 đ</strong></div>
+            </div>
+
+            <div class="form-grid four">
+              <div class="field">
+                <label for="expenseCategory">Mục chi</label>
+                <select id="expenseCategory"></select>
+              </div>
+              <div class="field">
+                <label for="expenseAmount">Số tiền chi</label>
+                <input id="expenseAmount" type="number" min="0" step="1000" placeholder="Ví dụ: 500000" />
+              </div>
+              <div class="field">
+                <label for="expenseDate">Ngày chi</label>
+                <input id="expenseDate" type="date" />
+              </div>
+              <button class="primary-btn" type="button" id="addExpenseBtn"><i class="fa-solid fa-plus"></i> Thêm chi</button>
+            </div>
+
+            <div class="form-actions">
+              <button class="ghost-btn" type="button" id="addExpenseCategoryBtn"><i class="fa-solid fa-folder-plus"></i> Thêm mục chi</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <h2><i class="fa-solid fa-receipt"></i> Lịch sử thu chi</h2>
+            <span class="badge muted" id="financeCount">0 giao dịch</span>
+          </div>
+          <div class="table-wrap">
+            <table aria-label="Lịch sử thu chi">
+              <thead>
+                <tr>
+                  <th>Ngày</th>
+                  <th>Loại</th>
+                  <th>Mục</th>
+                  <th>Học sinh / Ghi chú</th>
+                  <th>Số tiền</th>
+                </tr>
+              </thead>
+              <tbody id="financeTableBody"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section class="view" id="view-add" aria-labelledby="addTitle">
+        <div class="view-head">
+          <h2 id="addTitle"><i class="fa-solid fa-user-plus"></i> Thêm học sinh</h2>
+          <div class="mini-actions">
+            <button class="ghost-btn" type="button" id="addSubjectBtn"><i class="fa-solid fa-book-medical"></i> Thêm bộ môn</button>
+            <button class="ghost-btn" type="button" data-view="home"><i class="fa-solid fa-house"></i> Quay về trang chủ</button>
+          </div>
+        </div>
+
+        <article class="panel">
+          <div class="panel-body">
+            <form id="addStudentForm">
+              <div class="form-grid four">
+                <div class="field">
+                  <label for="studentName">Tên học sinh</label>
+                  <input id="studentName" type="text" placeholder="Ví dụ: Hoàng Tú" autocomplete="off" required />
+                </div>
+                <div class="field">
+                  <label for="studentSubject">Bộ môn</label>
+                  <select id="studentSubject" required></select>
+                </div>
+                <div class="field">
+                  <label for="studentStandard">Số buổi tiêu chuẩn</label>
+                  <input id="studentStandard" type="number" min="1" step="1" value="8" required />
+                </div>
+                <div class="field">
+                  <label for="studentCompleted">Đã học</label>
+                  <input id="studentCompleted" type="number" min="0" step="1" value="0" placeholder="Ví dụ: 3" />
+                </div>
+              </div>
+              <div class="form-actions">
+                <button class="primary-btn" type="submit"><i class="fa-solid fa-user-plus"></i> Thêm học sinh</button>
+              </div>
+            </form>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <h2><i class="fa-solid fa-users"></i> Thêm nhiều học sinh</h2>
+          </div>
+          <div class="panel-body">
+            <form id="bulkAddStudentForm">
+              <div class="field">
+                <label for="bulkStudentNames">Danh sách tên học sinh</label>
+                <textarea id="bulkStudentNames" placeholder="Mỗi dòng là một học sinh&#10;Ví dụ:&#10;Nguyễn Minh Anh&#10;Trần Gia Bảo&#10;Lê Khánh Linh"></textarea>
+              </div>
+              <div class="form-actions">
+                <button class="primary-btn" type="submit"><i class="fa-solid fa-users"></i> Thêm nhiều học sinh</button>
+              </div>
+            </form>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <input class="sr-only" id="excelFileInput" type="file" accept=".xlsx,.xls" />
+  <input class="sr-only" id="jsonFileInput" type="file" accept=".json,application/json" />
+
+  <div class="modal-overlay" id="modalOverlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <h3 id="modalTitle">Thông báo</h3>
+        <button class="icon-btn" type="button" id="modalCloseBtn" aria-label="Đóng"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body" id="modalMessage"></div>
+      <div class="modal-actions">
+        <button class="ghost-btn" type="button" id="modalCancelBtn">Hủy</button>
+        <button class="primary-btn" type="button" id="modalConfirmBtn">Đồng ý</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-region" id="toastRegion" aria-live="polite"></div>
+
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  <script>
+    /* =========================
+       Cấu hình lưu trữ và dữ liệu
+       ========================= */
+    const APP_VERSION = "1.0";
+    const STORAGE_KEY = "qlhs_students_v1";
+    const THEME_KEY = "qlhs_theme_v1";
+    const GOOGLE_SHEET_ID = "1y8nrTUNAy5jqnmXKI5Ol-kRRqni3sUKoSnVoprObZA4";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyA2-0Rfj_D9YUKjDyhyb84IvKQdYmlgI1c2auNLbN1qK_S58VgLsSBRCR8MQXVdwBo/exec";
+    const DEFAULT_SUBJECTS = ["Lập trình", "Robotics"];
+    const DEFAULT_EXPENSE_CATEGORIES = ["Tiền điện", "Tiền nước", "Wifi"];
+    const DEFAULT_STANDARD_SESSIONS = 8;
+    const NEAR_DUE_WINDOW = 2;
+    const AUTO_BACKUP_INTERVAL_MS = 5 * 60 * 1000;
+    const GOOGLE_SYNC_INTERVAL_MS = 5 * 1000;
+
+    const state = {
+      students: [],
+      finance: { transactions: [] },
+      settings: {
+        theme: "light",
+        subjects: [...DEFAULT_SUBJECTS],
+        expenseCategories: [...DEFAULT_EXPENSE_CATEGORIES],
+        googleSheetId: GOOGLE_SHEET_ID
+      },
+      lastBackup: "",
+      autoBackup: { lastBackup: "", data: null },
+      currentView: "home",
+      searchTerm: "",
+      managerSearchTerm: "",
+      managerSubjectFilter: "",
+      attendanceSearchTerm: "",
+      attendanceSubjectFilter: "",
+      remoteSyncPaused: false,
+      remoteDirty: true,
+      remoteSyncing: false
+    };
+
+    const elements = {
+      todayLabel: document.getElementById("todayLabel"),
+      globalSearch: document.getElementById("globalSearch"),
+      quickDarkToggle: document.getElementById("quickDarkToggle"),
+      themeCardBtn: document.getElementById("themeCardBtn"),
+      totalStudents: document.getElementById("totalStudents"),
+      totalSessions: document.getElementById("totalSessions"),
+      dueStudents: document.getElementById("dueStudents"),
+      totalSubjects: document.getElementById("totalSubjects"),
+      lastBackupLabel: document.getElementById("lastBackupLabel"),
+      visibleCount: document.getElementById("visibleCount"),
+      studentTableBody: document.getElementById("studentTableBody"),
+      attendanceDate: document.getElementById("attendanceDate"),
+      attendanceSearch: document.getElementById("attendanceSearch"),
+      attendanceSubjectFilter: document.getElementById("attendanceSubjectFilter"),
+      attendanceList: document.getElementById("attendanceList"),
+      selectAllAttendance: document.getElementById("selectAllAttendance"),
+      markAttendanceBtn: document.getElementById("markAttendanceBtn"),
+      rollbackAttendanceBtn: document.getElementById("rollbackAttendanceBtn"),
+      attendanceSyncBtn: document.getElementById("attendanceSyncBtn"),
+      paymentStudent: document.getElementById("paymentStudent"),
+      paymentCount: document.getElementById("paymentCount"),
+      paymentAmount: document.getElementById("paymentAmount"),
+      paymentPreview: document.getElementById("paymentPreview"),
+      payBtn: document.getElementById("payBtn"),
+      feeList: document.getElementById("feeList"),
+      totalIncome: document.getElementById("totalIncome"),
+      totalExpense: document.getElementById("totalExpense"),
+      netProfit: document.getElementById("netProfit"),
+      expenseCategory: document.getElementById("expenseCategory"),
+      expenseAmount: document.getElementById("expenseAmount"),
+      expenseDate: document.getElementById("expenseDate"),
+      addExpenseBtn: document.getElementById("addExpenseBtn"),
+      addExpenseCategoryBtn: document.getElementById("addExpenseCategoryBtn"),
+      financeCount: document.getElementById("financeCount"),
+      financeTableBody: document.getElementById("financeTableBody"),
+      managerSearch: document.getElementById("managerSearch"),
+      subjectFilter: document.getElementById("subjectFilter"),
+      managerTableBody: document.getElementById("managerTableBody"),
+      progressCount: document.getElementById("progressCount"),
+      progressTableHead: document.getElementById("progressTableHead"),
+      progressTableBody: document.getElementById("progressTableBody"),
+      addStudentForm: document.getElementById("addStudentForm"),
+      studentName: document.getElementById("studentName"),
+      studentSubject: document.getElementById("studentSubject"),
+      studentStandard: document.getElementById("studentStandard"),
+      studentCompleted: document.getElementById("studentCompleted"),
+      bulkAddStudentForm: document.getElementById("bulkAddStudentForm"),
+      bulkStudentNames: document.getElementById("bulkStudentNames"),
+      addSubjectBtn: document.getElementById("addSubjectBtn"),
+      syncSheetBtn: document.getElementById("syncSheetBtn"),
+      exportExcelBtn: document.getElementById("exportExcelBtn"),
+      importExcelBtn: document.getElementById("importExcelBtn"),
+      exportJsonBtn: document.getElementById("exportJsonBtn"),
+      importJsonBtn: document.getElementById("importJsonBtn"),
+      restoreBackupBtn: document.getElementById("restoreBackupBtn"),
+      excelFileInput: document.getElementById("excelFileInput"),
+      jsonFileInput: document.getElementById("jsonFileInput"),
+      modalOverlay: document.getElementById("modalOverlay"),
+      modalTitle: document.getElementById("modalTitle"),
+      modalMessage: document.getElementById("modalMessage"),
+      modalCloseBtn: document.getElementById("modalCloseBtn"),
+      modalCancelBtn: document.getElementById("modalCancelBtn"),
+      modalConfirmBtn: document.getElementById("modalConfirmBtn"),
+      toastRegion: document.getElementById("toastRegion")
+    };
+
+    /* =========================
+       Tiện ích chung
+       ========================= */
+    function makeId() {
+      return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
+    }
+
+    function todayISO() {
+      const date = new Date();
+      date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+      return date.toISOString().slice(0, 10);
+    }
+
+    function formatDate(isoDate) {
+      if (!isoDate || !/^\d{4}-\d{2}-\d{2}$/.test(isoDate)) return isoDate || "";
+      const [year, month, day] = isoDate.split("-");
+      return `${day}/${month}/${year}`;
+    }
+
+    function formatDateTime(value) {
+      if (!value) return "Chưa có";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "Chưa có";
+      const hours = String(date.getHours()).padStart(2, "0");
+      const minutes = String(date.getMinutes()).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const year = date.getFullYear();
+      return `${hours}:${minutes} ${day}/${month}/${year}`;
+    }
+
+    function parsePositiveInteger(value, fallback = DEFAULT_STANDARD_SESSIONS) {
+      const parsed = Number.parseInt(value, 10);
+      return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+    }
+
+    function parseNonNegativeInteger(value, fallback = 0) {
+      const parsed = Number.parseInt(value, 10);
+      return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
+    }
+
+    function parseMoney(value) {
+      const parsed = Number.parseFloat(value);
+      return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+    }
+
+    function formatMoney(value) {
+      return `${Math.round(Number(value) || 0).toLocaleString("vi-VN")} đ`;
+    }
+
+    function getSortableTime(dateValue) {
+      if (!dateValue || !/^\d{4}-\d{2}-\d{2}$/.test(dateValue)) return Number.MAX_SAFE_INTEGER;
+      const time = new Date(`${dateValue}T00:00:00`).getTime();
+      return Number.isFinite(time) ? time : Number.MAX_SAFE_INTEGER;
+    }
+
+    function sortSessionRefs(sessions) {
+      return sessions
+        .map((session, index) => ({ session, index }))
+        .sort((a, b) => {
+          const timeDiff = getSortableTime(a.session.date) - getSortableTime(b.session.date);
+          return timeDiff || a.index - b.index;
+        });
+    }
+
+    function normalizeText(value) {
+      return String(value || "")
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+    }
+
+    function normalizeNameKey(value) {
+      return String(value || "")
+        .trim()
+        .replace(/\s+/g, " ")
+        .normalize("NFC")
+        .toLocaleLowerCase("vi-VN");
+    }
+
+    function escapeHTML(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#039;"
+      }[char]));
+    }
+
+    function getInitials(name) {
+      return String(name || "")
+        .trim()
+        .split(/\s+/)
+        .slice(-2)
+        .map((word) => word.charAt(0).toUpperCase())
+        .join("") || "HS";
+    }
+
+    function getSessionCount(student) {
+      return Array.isArray(student.sessions) ? student.sessions.length : 0;
+    }
+
+    function getStandardSessions(student) {
+      return parseNonNegativeInteger(student.standardSessions, DEFAULT_STANDARD_SESSIONS);
+    }
+
+    function getSortedSessions(student) {
+      return sortSessionRefs(Array.isArray(student.sessions) ? student.sessions : []).map((item) => item.session);
+    }
+
+    function getStudentStatus(student) {
+      const count = getSessionCount(student);
+      const standard = getStandardSessions(student);
+      const remaining = Math.max(standard - count, 0);
+
+      if (standard === 0) {
+        return { label: "Chưa đặt chuẩn", className: "muted", icon: "fa-circle-info" };
+      }
+
+      if (count > standard) {
+        return { label: "Học vượt", className: "over", icon: "fa-triangle-exclamation" };
+      }
+      if (count === standard) {
+        return { label: "Đủ học phí", className: "due", icon: "fa-circle-check" };
+      }
+      if (remaining <= NEAR_DUE_WINDOW) {
+        return { label: "Gần đủ", className: "near", icon: "fa-hourglass-half" };
+      }
+      return { label: `Còn ${remaining} buổi`, className: "ok", icon: "fa-book-open-reader" };
+    }
+
+    function getFilteredStudents() {
+      if (!state.searchTerm) return [...state.students];
+      return state.students.filter((student) => {
+        const target = `${student.name} ${student.subject}`;
+        return normalizeText(target).includes(state.searchTerm);
+      });
+    }
+
+    function sortStudents(students) {
+      return [...students].sort((a, b) => a.name.localeCompare(b.name, "vi"));
+    }
+
+    function getManagerStudents() {
+      return sortStudents(state.students.filter((student) => {
+        const matchedSearch = !state.managerSearchTerm || normalizeText(`${student.name} ${student.subject}`).includes(state.managerSearchTerm);
+        const matchedSubject = !state.managerSubjectFilter || normalizeText(student.subject) === state.managerSubjectFilter;
+        return matchedSearch && matchedSubject;
+      }));
+    }
+
+    function normalizeList(values, fallbackValues) {
+      const source = Array.isArray(values) ? values : [];
+      const merged = [...fallbackValues, ...source]
+        .map((value) => String(value || "").trim())
+        .filter(Boolean);
+      const seen = new Set();
+      return merged.filter((value) => {
+        const key = normalizeText(value);
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    }
+
+    function getAttendanceStudents() {
+      return sortStudents(state.students.filter((student) => {
+        const target = normalizeText(`${student.name} ${student.subject}`);
+        const matchedGlobal = !state.searchTerm || target.includes(state.searchTerm);
+        const matchedSearch = !state.attendanceSearchTerm || target.includes(state.attendanceSearchTerm);
+        const matchedSubject = !state.attendanceSubjectFilter || normalizeText(student.subject) === state.attendanceSubjectFilter;
+        return matchedGlobal && matchedSearch && matchedSubject;
+      }));
+    }
+
+    /* =========================
+       LocalStorage
+       ========================= */
+    function createSampleStudents() {
+      return [
+        {
+          id: makeId(),
+          name: "Hoàng Tú",
+          subject: "Toán",
+          standardSessions: 8,
+          sessions: ["2026-05-01", "2026-05-03", "2026-05-06"].map((date) => ({ date }))
+        },
+        {
+          id: makeId(),
+          name: "Nam Anh",
+          subject: "Văn",
+          standardSessions: 4,
+          sessions: ["2026-05-02", "2026-05-04"].map((date) => ({ date }))
+        },
+        {
+          id: makeId(),
+          name: "Minh Châu",
+          subject: "Tiếng Anh",
+          standardSessions: 8,
+          sessions: ["2026-04-20", "2026-04-22", "2026-04-24", "2026-04-27", "2026-04-29", "2026-05-04", "2026-05-06", "2026-05-08"].map((date) => ({ date }))
+        },
+        {
+          id: makeId(),
+          name: "Gia Huy",
+          subject: "Vật lý",
+          standardSessions: 12,
+          sessions: ["2026-04-15", "2026-04-17", "2026-04-19", "2026-04-22", "2026-04-24", "2026-04-26", "2026-04-29", "2026-05-01", "2026-05-03", "2026-05-05"].map((date) => ({ date }))
+        }
+      ].map(normalizeStudent);
+    }
+
+    function normalizeStudent(rawStudent) {
+      const sessions = Array.isArray(rawStudent.sessions)
+        ? rawStudent.sessions
+            .map((session, index) => {
+              if (typeof session === "string") return { date: session };
+              return { date: String(session?.date || `imported-${index + 1}`) };
+            })
+            .filter((session) => session.date)
+        : [];
+
+      return {
+        id: rawStudent.id || makeId(),
+        name: String(rawStudent.name || "").trim(),
+        subject: String(rawStudent.subject || "").trim(),
+        standardSessions: parseNonNegativeInteger(rawStudent.standardSessions, DEFAULT_STANDARD_SESSIONS),
+        sessions: sortSessionRefs(sessions).map((item) => item.session)
+      };
+    }
+
+    function createDefaultAppData() {
+      return {
+        version: APP_VERSION,
+        students: createSampleStudents(),
+        finance: { transactions: [] },
+        settings: {
+          theme: localStorage.getItem(THEME_KEY) || "light",
+          subjects: [...DEFAULT_SUBJECTS],
+          expenseCategories: [...DEFAULT_EXPENSE_CATEGORIES],
+          googleSheetId: GOOGLE_SHEET_ID
+        },
+        lastBackup: "",
+        autoBackup: {
+          lastBackup: "",
+          data: null
+        }
+      };
+    }
+
+    function normalizeSettings(rawSettings = {}) {
+      const theme = rawSettings.theme === "dark" ? "dark" : "light";
+      return {
+        theme,
+        subjects: normalizeList(rawSettings.subjects, DEFAULT_SUBJECTS),
+        expenseCategories: normalizeList(rawSettings.expenseCategories, DEFAULT_EXPENSE_CATEGORIES),
+        googleSheetId: String(rawSettings.googleSheetId || GOOGLE_SHEET_ID).trim()
+      };
+    }
+
+    function normalizeFinance(rawFinance = {}) {
+      const transactions = Array.isArray(rawFinance.transactions)
+        ? rawFinance.transactions.map((transaction) => ({
+            id: transaction.id || makeId(),
+            type: transaction.type === "expense" ? "expense" : "income",
+            category: String(transaction.category || (transaction.type === "expense" ? "Chi khác" : "Học phí")).trim(),
+            amount: parseMoney(transaction.amount),
+            date: String(transaction.date || todayISO()),
+            studentId: String(transaction.studentId || ""),
+            studentName: String(transaction.studentName || ""),
+            note: String(transaction.note || "")
+          })).filter((transaction) => transaction.amount > 0)
+        : [];
+
+      return { transactions };
+    }
+
+    function normalizeAutoBackup(rawAutoBackup = {}) {
+      return {
+        lastBackup: String(rawAutoBackup.lastBackup || ""),
+        data: rawAutoBackup.data && typeof rawAutoBackup.data === "object" ? rawAutoBackup.data : null
+      };
+    }
+
+    function normalizeAppData(rawData) {
+      if (Array.isArray(rawData)) {
+        return {
+          version: APP_VERSION,
+          students: rawData.map(normalizeStudent).filter((student) => student.name && student.subject),
+          finance: { transactions: [] },
+          settings: normalizeSettings({ theme: localStorage.getItem(THEME_KEY) || "light" }),
+          lastBackup: "",
+          autoBackup: { lastBackup: "", data: null }
+        };
+      }
+
+      if (!rawData || typeof rawData !== "object") {
+        return createDefaultAppData();
+      }
+
+      return {
+        version: String(rawData.version || APP_VERSION),
+        students: Array.isArray(rawData.students)
+          ? rawData.students.map(normalizeStudent).filter((student) => student.name && student.subject)
+          : createSampleStudents(),
+        finance: normalizeFinance(rawData.finance),
+        settings: normalizeSettings(rawData.settings),
+        lastBackup: String(rawData.lastBackup || rawData.autoBackup?.lastBackup || ""),
+        autoBackup: normalizeAutoBackup(rawData.autoBackup)
+      };
+    }
+
+    function buildProgressSheetRows() {
+      const students = sortStudents(state.students);
+      const maxSessions = Math.max(1, ...students.map((student) => getSessionCount(student)));
+      const header = [
+        "Tên học sinh",
+        ...Array.from({ length: maxSessions }, (_, index) => `Ngày học ${index + 1}`)
+      ];
+      const rows = students.map((student) => {
+        const sessions = getSortedSessions(student);
+        return [
+          student.name,
+          ...Array.from({ length: maxSessions }, (_, index) => sessions[index] ? formatDate(sessions[index].date) : "")
+        ];
+      });
+      return [header, ...rows];
+    }
+
+    function buildFinanceSheetRows() {
+      return [
+        ["Ngày", "Loại", "Mục", "Học sinh / Ghi chú", "Số tiền"],
+        ...state.finance.transactions.map((transaction) => [
+          formatDate(transaction.date),
+          transaction.type === "income" ? "Thu" : "Chi",
+          transaction.category,
+          transaction.studentName || transaction.note || "",
+          transaction.amount
+        ])
+      ];
+    }
+
+    function buildSheetViews() {
+      return {
+        progressRows: buildProgressSheetRows(),
+        financeRows: buildFinanceSheetRows()
+      };
+    }
+
+    function buildBackupPayload() {
+      return {
+        version: APP_VERSION,
+        students: state.students,
+        finance: state.finance,
+        settings: state.settings,
+        lastBackup: state.lastBackup,
+        sheetViews: buildSheetViews()
+      };
+    }
+
+    function buildAppData() {
+      return {
+        version: APP_VERSION,
+        students: state.students,
+        finance: state.finance,
+        settings: state.settings,
+        lastBackup: state.lastBackup,
+        autoBackup: state.autoBackup,
+        sheetViews: buildSheetViews()
+      };
+    }
+
+    function applyAppData(appData, { preserveAutoBackup = false } = {}) {
+      const normalized = normalizeAppData(appData);
+      state.students = normalized.students;
+      state.finance = normalizeFinance(normalized.finance);
+      state.settings = normalizeSettings(normalized.settings);
+
+      if (!preserveAutoBackup) {
+        state.lastBackup = normalized.lastBackup;
+        state.autoBackup = normalizeAutoBackup(normalized.autoBackup);
+      }
+
+      applyTheme(state.settings.theme, false);
+    }
+
+    function loadStudents() {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (!stored) {
+        applyAppData(createDefaultAppData());
+        saveAppData();
+        return;
+      }
+
+      try {
+        const parsed = JSON.parse(stored);
+        applyAppData(normalizeAppData(parsed));
+        saveAppData();
+      } catch (error) {
+        console.warn("Không đọc được localStorage, dùng dữ liệu mẫu.", error);
+        applyAppData(createDefaultAppData());
+        saveAppData();
+      }
+    }
+
+    function saveAppData() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(buildAppData()));
+        localStorage.setItem(THEME_KEY, state.settings.theme);
+        if (!state.remoteSyncPaused) markRemoteDirty();
+        return true;
+      } catch (error) {
+        console.error("Không thể lưu dữ liệu vào localStorage.", error);
+        showToast("Không thể lưu dữ liệu vào localStorage.", "error");
+        return false;
+      }
+    }
+
+    function saveStudents() {
+      saveAppData();
+    }
+
+    /* =========================
+       Render giao diện
+       ========================= */
+    function renderAll() {
+      renderStats();
+      renderSubjectSelect();
+      renderStudentTable();
+      renderAttendanceList();
+      renderPaymentOptions();
+      renderFeeList();
+      renderSubjectFilter();
+      renderAttendanceSubjectFilter();
+      renderManagerTable();
+      renderProgressTable();
+      renderExpenseCategories();
+      renderFinance();
+      renderBackupStatus();
+      updateThemeIcons();
+    }
+
+    function renderStats() {
+      const totalSessions = state.students.reduce((sum, student) => sum + getSessionCount(student), 0);
+      const nearDueStudents = state.students.filter((student) => {
+        const count = getSessionCount(student);
+        const standard = getStandardSessions(student);
+        return standard > 0 && count >= Math.max(standard - NEAR_DUE_WINDOW, 0) && count <= standard;
+      }).length;
+      const overStudents = state.students.filter((student) => getSessionCount(student) > getStandardSessions(student)).length;
+
+      elements.totalStudents.textContent = state.students.length;
+      elements.totalSessions.textContent = totalSessions;
+      elements.dueStudents.textContent = nearDueStudents;
+      elements.totalSubjects.textContent = overStudents;
+    }
+
+    function renderStudentTable() {
+      const students = sortStudents(getFilteredStudents());
+      elements.visibleCount.textContent = `${students.length} học sinh`;
+
+      if (!students.length) {
+        elements.studentTableBody.innerHTML = `
+          <tr>
+            <td colspan="5" class="empty-state">Không tìm thấy học sinh.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      elements.studentTableBody.innerHTML = students.map((student) => {
+        const count = getSessionCount(student);
+        const status = getStudentStatus(student);
+        return `
+          <tr>
+            <td>
+              <span class="student-name">
+                <span class="avatar">${escapeHTML(getInitials(student.name))}</span>
+                ${escapeHTML(student.name)}
+              </span>
+            </td>
+            <td>${escapeHTML(student.subject)}</td>
+            <td><strong>${count}</strong></td>
+            <td>${getStandardSessions(student)} buổi</td>
+            <td><span class="badge ${status.className}"><i class="fa-solid ${status.icon}"></i>${status.label}</span></td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function renderAttendanceList() {
+      const students = getAttendanceStudents();
+      elements.selectAllAttendance.innerHTML = `<i class="fa-solid fa-check-double"></i> Chọn tất cả`;
+
+      if (!students.length) {
+        elements.attendanceList.innerHTML = `<div class="empty-state">Không có học sinh phù hợp.</div>`;
+        return;
+      }
+
+      elements.attendanceList.innerHTML = students.map((student) => `
+        <label class="check-item">
+          <input type="checkbox" value="${escapeHTML(student.id)}" />
+          <span>
+            <strong>${escapeHTML(student.name)}</strong>
+            <small>${escapeHTML(student.subject)} · ${getSessionCount(student)}/${getStandardSessions(student)} buổi</small>
+          </span>
+        </label>
+      `).join("");
+    }
+
+    function renderSubjectSelect() {
+      const currentValue = elements.studentSubject.value;
+      elements.studentSubject.innerHTML = state.settings.subjects
+        .map((subject) => `<option value="${escapeHTML(subject)}">${escapeHTML(subject)}</option>`)
+        .join("");
+
+      if (state.settings.subjects.includes(currentValue)) {
+        elements.studentSubject.value = currentValue;
+      }
+    }
+
+    function renderAttendanceSubjectFilter() {
+      const currentValue = elements.attendanceSubjectFilter.value;
+      const subjects = normalizeList(state.students.map((student) => student.subject).filter(Boolean), state.settings.subjects)
+        .sort((a, b) => a.localeCompare(b, "vi"));
+
+      elements.attendanceSubjectFilter.innerHTML = `
+        <option value="">Tất cả bộ môn</option>
+        ${subjects.map((subject) => `<option value="${escapeHTML(normalizeText(subject))}">${escapeHTML(subject)}</option>`).join("")}
+      `;
+
+      if (subjects.some((subject) => normalizeText(subject) === currentValue)) {
+        elements.attendanceSubjectFilter.value = currentValue;
+      } else {
+        state.attendanceSubjectFilter = "";
+      }
+    }
+
+    function renderPaymentOptions() {
+      const currentValue = elements.paymentStudent.value;
+      const students = sortStudents(state.students);
+
+      elements.paymentStudent.innerHTML = `
+        <option value="">Chọn học sinh</option>
+        ${students.map((student) => `
+          <option value="${escapeHTML(student.id)}">${escapeHTML(student.name)} - ${escapeHTML(student.subject)} (${getSessionCount(student)} buổi)</option>
+        `).join("")}
+      `;
+
+      const selectedStudent = students.find((student) => student.id === currentValue);
+      if (selectedStudent) {
+        elements.paymentStudent.value = currentValue;
+      } else {
+        elements.paymentCount.value = "";
+      }
+
+      if (selectedStudent && !elements.paymentCount.value) {
+        const count = getSessionCount(selectedStudent);
+        elements.paymentCount.value = count ? Math.min(getStandardSessions(selectedStudent), count) : "";
+      }
+
+      updatePaymentPreview();
+    }
+
+    function renderFeeList() {
+      const students = sortStudents(state.students.filter((student) => {
+        const standard = getStandardSessions(student);
+        return standard > 0 && getSessionCount(student) >= standard;
+      }));
+
+      if (!students.length) {
+        elements.feeList.innerHTML = `<div class="empty-state">Chưa có học sinh đạt số buổi tiêu chuẩn.</div>`;
+        return;
+      }
+
+      elements.feeList.innerHTML = students.map((student) => {
+        const count = getSessionCount(student);
+        const status = getStudentStatus(student);
+        return `
+          <article class="fee-card ${status.className === "over" ? "over" : ""}">
+            <div>
+              <h3>${escapeHTML(student.name)}</h3>
+              <p>${escapeHTML(student.subject)} · ${count}/${getStandardSessions(student)} buổi</p>
+            </div>
+            <span class="badge ${status.className}"><i class="fa-solid ${status.icon}"></i>${status.label}</span>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function renderSubjectFilter() {
+      const currentValue = elements.subjectFilter.value;
+      const subjects = normalizeList(state.students.map((student) => student.subject).filter(Boolean), state.settings.subjects)
+        .sort((a, b) => a.localeCompare(b, "vi"));
+
+      elements.subjectFilter.innerHTML = `
+        <option value="">Tất cả bộ môn</option>
+        ${subjects.map((subject) => `<option value="${escapeHTML(normalizeText(subject))}">${escapeHTML(subject)}</option>`).join("")}
+      `;
+
+      if (subjects.some((subject) => normalizeText(subject) === currentValue)) {
+        elements.subjectFilter.value = currentValue;
+      } else {
+        state.managerSubjectFilter = "";
+      }
+    }
+
+    function renderManagerTable() {
+      const students = getManagerStudents();
+
+      if (!students.length) {
+        elements.managerTableBody.innerHTML = `
+          <tr>
+            <td colspan="6" class="empty-state">Không có học sinh phù hợp.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      elements.managerTableBody.innerHTML = students.map((student) => {
+        const status = getStudentStatus(student);
+        return `
+          <tr>
+            <td>
+              <span class="student-name">
+                <span class="avatar">${escapeHTML(getInitials(student.name))}</span>
+                ${escapeHTML(student.name)}
+              </span>
+            </td>
+            <td>${escapeHTML(student.subject)}</td>
+            <td><strong>${getSessionCount(student)}</strong></td>
+            <td>${getStandardSessions(student)} buổi</td>
+            <td><span class="badge ${status.className}"><i class="fa-solid ${status.icon}"></i>${status.label}</span></td>
+            <td>
+              <div class="mini-actions">
+                <button class="mini-btn" type="button" data-manage-action="edit-name" data-id="${escapeHTML(student.id)}"><i class="fa-solid fa-pen"></i>Sửa tên</button>
+                <button class="mini-btn" type="button" data-manage-action="edit-subject" data-id="${escapeHTML(student.id)}"><i class="fa-solid fa-book"></i>Sửa bộ môn</button>
+                <button class="mini-btn" type="button" data-manage-action="edit-standard" data-id="${escapeHTML(student.id)}"><i class="fa-solid fa-sliders"></i>Sửa chuẩn</button>
+                <button class="mini-btn" type="button" data-manage-action="edit-sessions" data-id="${escapeHTML(student.id)}"><i class="fa-solid fa-list-ol"></i>Sửa buổi</button>
+                <button class="mini-btn danger" type="button" data-manage-action="delete" data-id="${escapeHTML(student.id)}"><i class="fa-solid fa-trash"></i>Xoá</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function renderProgressTable() {
+      const students = sortStudents(getFilteredStudents());
+      const maxSessions = Math.max(1, ...students.map((student) => getSessionCount(student)));
+      elements.progressCount.textContent = `${students.length} học sinh`;
+      elements.progressTableHead.innerHTML = `
+        <tr>
+          <th>Tên học sinh</th>
+          ${Array.from({ length: maxSessions }, (_, index) => `<th>Ngày học ${index + 1}</th>`).join("")}
+        </tr>
+      `;
+
+      if (!students.length) {
+        elements.progressTableBody.innerHTML = `
+          <tr>
+            <td colspan="${maxSessions + 1}" class="empty-state">Không tìm thấy học sinh.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      elements.progressTableBody.innerHTML = students.map((student) => {
+        const sessions = getSortedSessions(student);
+        return `
+          <tr>
+            <td>
+              <span class="student-name">
+                <span class="avatar">${escapeHTML(getInitials(student.name))}</span>
+                ${escapeHTML(student.name)}
+              </span>
+            </td>
+            ${Array.from({ length: maxSessions }, (_, index) => `<td>${sessions[index] ? `<span class="date-chip">${escapeHTML(formatDate(sessions[index].date))}</span>` : ""}</td>`).join("")}
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function updatePaymentPreview() {
+      const student = state.students.find((item) => item.id === elements.paymentStudent.value);
+      if (!student) {
+        elements.paymentPreview.textContent = "Chưa chọn học sinh.";
+        return;
+      }
+
+      const currentCount = getSessionCount(student);
+      const requestedCount = parsePositiveInteger(elements.paymentCount.value, 0);
+      const paymentAmount = parseMoney(elements.paymentAmount.value);
+      const payCount = Math.min(requestedCount, currentCount);
+      const remaining = Math.max(currentCount - payCount, 0);
+      const oldestSessions = getSortedSessions(student).slice(0, payCount).map((session) => formatDate(session.date));
+      elements.paymentPreview.innerHTML = `
+        <div class="summary-metrics">
+          <div class="summary-metric"><span>Tổng số buổi hiện tại</span><strong>${currentCount}</strong></div>
+          <div class="summary-metric"><span>Số buổi thanh toán</span><strong>${payCount}</strong></div>
+          <div class="summary-metric"><span>Còn lại sau thanh toán</span><strong>${remaining}</strong></div>
+        </div>
+        <div class="summary-note">Sẽ trừ các buổi cũ nhất: ${oldestSessions.length ? oldestSessions.join(", ") : "chưa có buổi để trừ"}. Số tiền ghi nhận: ${formatMoney(paymentAmount)}.</div>
+      `;
+    }
+
+    function renderExpenseCategories() {
+      const currentValue = elements.expenseCategory.value;
+      elements.expenseCategory.innerHTML = state.settings.expenseCategories
+        .map((category) => `<option value="${escapeHTML(category)}">${escapeHTML(category)}</option>`)
+        .join("");
+
+      if (state.settings.expenseCategories.includes(currentValue)) {
+        elements.expenseCategory.value = currentValue;
+      }
+    }
+
+    function renderFinance() {
+      const transactions = [...state.finance.transactions].sort((a, b) => getSortableTime(b.date) - getSortableTime(a.date));
+      const totalIncome = transactions.filter((item) => item.type === "income").reduce((sum, item) => sum + item.amount, 0);
+      const totalExpense = transactions.filter((item) => item.type === "expense").reduce((sum, item) => sum + item.amount, 0);
+
+      elements.totalIncome.textContent = formatMoney(totalIncome);
+      elements.totalExpense.textContent = formatMoney(totalExpense);
+      elements.netProfit.textContent = formatMoney(totalIncome - totalExpense);
+      elements.financeCount.textContent = `${transactions.length} giao dịch`;
+
+      if (!transactions.length) {
+        elements.financeTableBody.innerHTML = `<tr><td colspan="5" class="empty-state">Chưa có giao dịch thu chi.</td></tr>`;
+        return;
+      }
+
+      elements.financeTableBody.innerHTML = transactions.map((transaction) => `
+        <tr>
+          <td>${escapeHTML(formatDate(transaction.date))}</td>
+          <td><span class="badge ${transaction.type === "income" ? "ok" : "over"}">${transaction.type === "income" ? "Thu" : "Chi"}</span></td>
+          <td>${escapeHTML(transaction.category)}</td>
+          <td>${escapeHTML(transaction.studentName || transaction.note || "-")}</td>
+          <td><strong>${escapeHTML(formatMoney(transaction.amount))}</strong></td>
+        </tr>
+      `).join("");
+    }
+
+    function setDefaultPaymentCount() {
+      const student = state.students.find((item) => item.id === elements.paymentStudent.value);
+      const count = student ? getSessionCount(student) : 0;
+      elements.paymentCount.value = student && count ? Math.min(getStandardSessions(student), count) : "";
+      updatePaymentPreview();
+    }
+
+    function renderBackupStatus() {
+      const latestBackup = [state.lastBackup, state.autoBackup?.lastBackup]
+        .filter(Boolean)
+        .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())[0];
+      elements.lastBackupLabel.innerHTML = `<i class="fa-solid fa-clock"></i> Backup gần nhất: ${escapeHTML(formatDateTime(latestBackup))}`;
+    }
+
+    /* =========================
+       Điều hướng và theme
+       ========================= */
+    function showView(viewName) {
+      showLoading();
+      state.currentView = viewName;
+      document.querySelectorAll(".view").forEach((view) => {
+        view.classList.toggle("active", view.id === `view-${viewName}`);
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function showLoading(duration = 520) {
+      document.body.classList.add("loading");
+      window.clearTimeout(showLoading.timer);
+      showLoading.timer = window.setTimeout(() => {
+        document.body.classList.remove("loading");
+      }, duration);
+    }
+
+    function applyTheme(theme, persist = true) {
+      state.settings.theme = theme === "dark" ? "dark" : "light";
+      document.body.classList.toggle("dark", theme === "dark");
+      if (persist) saveAppData();
+      updateThemeIcons();
+    }
+
+    function toggleTheme() {
+      const nextTheme = document.body.classList.contains("dark") ? "light" : "dark";
+      applyTheme(nextTheme);
+    }
+
+    function updateThemeIcons() {
+      const isDark = document.body.classList.contains("dark");
+      elements.quickDarkToggle.innerHTML = `<i class="fa-solid ${isDark ? "fa-sun" : "fa-moon"}"></i>`;
+      elements.quickDarkToggle.title = isDark ? "Light Mode" : "Dark Mode";
+    }
+
+    /* =========================
+       Modal và toast
+       ========================= */
+    function showToast(message, type = "success") {
+      const toast = document.createElement("div");
+      toast.className = `toast ${type}`;
+      toast.innerHTML = `<i class="fa-solid ${type === "error" ? "fa-circle-xmark" : "fa-circle-check"}"></i><span>${escapeHTML(message)}</span>`;
+      elements.toastRegion.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transform = "translateY(10px)";
+        setTimeout(() => toast.remove(), 180);
+      }, 2800);
+    }
+
+    function showModal({ title, message, confirmText = "Đồng ý", cancelText = "Hủy", danger = false }) {
+      return new Promise((resolve) => {
+        elements.modalTitle.textContent = title;
+        elements.modalMessage.textContent = message;
+        elements.modalConfirmBtn.textContent = confirmText;
+        elements.modalCancelBtn.textContent = cancelText;
+        elements.modalCancelBtn.hidden = !cancelText;
+        elements.modalConfirmBtn.className = danger ? "danger-btn" : "primary-btn";
+        elements.modalOverlay.hidden = false;
+        elements.modalConfirmBtn.focus();
+
+        const cleanup = (result) => {
+          elements.modalOverlay.hidden = true;
+          elements.modalConfirmBtn.removeEventListener("click", onConfirm);
+          elements.modalCancelBtn.removeEventListener("click", onCancel);
+          elements.modalCloseBtn.removeEventListener("click", onCancel);
+          document.removeEventListener("keydown", onKeydown);
+          resolve(result);
+        };
+
+        const onConfirm = () => cleanup(true);
+        const onCancel = () => cleanup(false);
+        const onKeydown = (event) => {
+          if (event.key === "Escape") cleanup(false);
+        };
+
+        elements.modalConfirmBtn.addEventListener("click", onConfirm);
+        elements.modalCancelBtn.addEventListener("click", onCancel);
+        elements.modalCloseBtn.addEventListener("click", onCancel);
+        document.addEventListener("keydown", onKeydown);
+      });
+    }
+
+    function showInputModal({ title, label, value = "", type = "text", min = "", confirmText = "Lưu" }) {
+      return new Promise((resolve) => {
+        elements.modalTitle.textContent = title;
+        elements.modalMessage.innerHTML = `
+          <div class="modal-field">
+            <label for="modalInput">${escapeHTML(label)}</label>
+            <input id="modalInput" type="${escapeHTML(type)}" value="${escapeHTML(value)}" ${min !== "" ? `min="${escapeHTML(min)}"` : ""} />
+          </div>
+        `;
+        elements.modalConfirmBtn.textContent = confirmText;
+        elements.modalCancelBtn.textContent = "Hủy";
+        elements.modalCancelBtn.hidden = false;
+        elements.modalConfirmBtn.className = "primary-btn";
+        elements.modalOverlay.hidden = false;
+
+        const input = document.getElementById("modalInput");
+        input.focus();
+        input.select();
+
+        const cleanup = (result) => {
+          elements.modalOverlay.hidden = true;
+          elements.modalConfirmBtn.removeEventListener("click", onConfirm);
+          elements.modalCancelBtn.removeEventListener("click", onCancel);
+          elements.modalCloseBtn.removeEventListener("click", onCancel);
+          input.removeEventListener("keydown", onInputKeydown);
+          document.removeEventListener("keydown", onKeydown);
+          resolve(result);
+        };
+
+        const onConfirm = () => cleanup(input.value.trim());
+        const onCancel = () => cleanup(null);
+        const onInputKeydown = (event) => {
+          if (event.key === "Enter") onConfirm();
+        };
+        const onKeydown = (event) => {
+          if (event.key === "Escape") cleanup(null);
+        };
+
+        elements.modalConfirmBtn.addEventListener("click", onConfirm);
+        elements.modalCancelBtn.addEventListener("click", onCancel);
+        elements.modalCloseBtn.addEventListener("click", onCancel);
+        input.addEventListener("keydown", onInputKeydown);
+        document.addEventListener("keydown", onKeydown);
+      });
+    }
+
+    function showChoiceModal({ title, message, choices = [] }) {
+      return new Promise((resolve) => {
+        elements.modalTitle.textContent = title;
+        elements.modalMessage.innerHTML = `
+          <p>${escapeHTML(message)}</p>
+          <div class="choice-grid">
+            ${choices.map((choice) => `
+              <button class="choice-btn" type="button" data-choice="${escapeHTML(choice.value)}">
+                <i class="fa-solid ${escapeHTML(choice.icon || "fa-circle-dot")} fa-lg"></i>
+                <span>
+                  <strong>${escapeHTML(choice.label)}</strong>
+                  <small>${escapeHTML(choice.description || "")}</small>
+                </span>
+              </button>
+            `).join("")}
+          </div>
+        `;
+        elements.modalConfirmBtn.hidden = true;
+        elements.modalCancelBtn.hidden = false;
+        elements.modalCancelBtn.textContent = "Hủy";
+        elements.modalOverlay.hidden = false;
+
+        const cleanup = (result) => {
+          elements.modalOverlay.hidden = true;
+          elements.modalConfirmBtn.hidden = false;
+          elements.modalMessage.removeEventListener("click", onChoice);
+          elements.modalCancelBtn.removeEventListener("click", onCancel);
+          elements.modalCloseBtn.removeEventListener("click", onCancel);
+          document.removeEventListener("keydown", onKeydown);
+          resolve(result);
+        };
+
+        const onChoice = (event) => {
+          const button = event.target.closest("[data-choice]");
+          if (button) cleanup(button.dataset.choice);
+        };
+        const onCancel = () => cleanup(null);
+        const onKeydown = (event) => {
+          if (event.key === "Escape") cleanup(null);
+        };
+
+        elements.modalMessage.addEventListener("click", onChoice);
+        elements.modalCancelBtn.addEventListener("click", onCancel);
+        elements.modalCloseBtn.addEventListener("click", onCancel);
+        document.addEventListener("keydown", onKeydown);
+      });
+    }
+
+    /* =========================
+       Chức năng thêm học sinh
+       ========================= */
+    async function addStudent(event) {
+      event.preventDefault();
+      const name = elements.studentName.value.trim();
+      const subject = elements.studentSubject.value.trim();
+      const standardSessions = parsePositiveInteger(elements.studentStandard.value, DEFAULT_STANDARD_SESSIONS);
+      const completedSessions = Number.parseInt(elements.studentCompleted.value, 10) || 0;
+
+      if (!name || !subject) {
+        showToast("Vui lòng nhập đầy đủ tên học sinh và bộ môn.", "error");
+        return;
+      }
+
+      if (completedSessions < 0) {
+        showToast("Số buổi đã học không được âm.", "error");
+        return;
+      }
+
+      const isDuplicated = state.students.some((student) => normalizeNameKey(student.name) === normalizeNameKey(name));
+      if (isDuplicated) {
+        await showModal({
+          title: "Trùng tên học sinh",
+          message: "Tên học sinh này đã tồn tại trong danh sách.",
+          confirmText: "Đã hiểu",
+          cancelText: ""
+        });
+        return;
+      }
+
+      const today = todayISO();
+      const sessions = Array.from({ length: completedSessions }, () => ({ date: today }));
+      state.students.push({ id: makeId(), name, subject, standardSessions, sessions });
+      saveStudents();
+      renderAll();
+      elements.addStudentForm.reset();
+      elements.studentStandard.value = DEFAULT_STANDARD_SESSIONS;
+      elements.studentCompleted.value = 0;
+      showToast("Đã thêm học sinh thành công.");
+      await showModal({
+        title: "Thành công",
+        message: `Đã thêm học sinh ${name}.${completedSessions ? `\nHệ thống đã tự tạo ${completedSessions} buổi đã học vào ngày ${formatDate(today)}.` : ""}`,
+        confirmText: "OK",
+        cancelText: ""
+      });
+    }
+
+    async function addBulkStudents(event) {
+      event.preventDefault();
+      const names = elements.bulkStudentNames.value
+        .split(/\r?\n/)
+        .map((name) => name.trim())
+        .filter(Boolean);
+
+      if (!names.length) {
+        showToast("Vui lòng nhập ít nhất một tên học sinh.", "error");
+        return;
+      }
+
+      const existingNames = new Set(state.students.map((student) => normalizeNameKey(student.name)));
+      const inputNames = new Set();
+      const duplicatedNames = [];
+      const newStudents = [];
+
+      names.forEach((name) => {
+        const key = normalizeNameKey(name);
+        if (inputNames.has(key) || existingNames.has(key)) {
+          duplicatedNames.push(name);
+          return;
+        }
+
+        inputNames.add(key);
+        newStudents.push({
+          id: makeId(),
+          name,
+          subject: "Chưa có bộ môn",
+          standardSessions: 0,
+          sessions: []
+        });
+      });
+
+      if (!newStudents.length) {
+        await showModal({
+          title: "Không có học sinh mới",
+          message: "Các tên trong danh sách đều đã tồn tại hoặc bị trùng trong nội dung vừa nhập.",
+          confirmText: "Đã hiểu",
+          cancelText: ""
+        });
+        return;
+      }
+
+      state.students.push(...newStudents);
+      saveStudents();
+      renderAll();
+      elements.bulkStudentNames.value = "";
+
+      const skippedMessage = duplicatedNames.length
+        ? `\n\nĐã bỏ qua ${duplicatedNames.length} tên bị trùng:\n${duplicatedNames.slice(0, 12).map((name) => `- ${name}`).join("\n")}${duplicatedNames.length > 12 ? "\n- ..." : ""}`
+        : "";
+
+      showToast(`Đã thêm ${newStudents.length} học sinh.`);
+      await showModal({
+        title: "Đã thêm nhiều học sinh",
+        message: `Đã thêm ${newStudents.length} học sinh mới.\nBộ môn mặc định: Chưa có bộ môn.\nSố buổi hiện tại: 0.\nSố buổi tiêu chuẩn: 0.${skippedMessage}`,
+        confirmText: "OK",
+        cancelText: ""
+      });
+    }
+
+    /* =========================
+       Chức năng điểm danh
+       ========================= */
+    function getSelectedAttendanceStudents() {
+      const checkedIds = [...elements.attendanceList.querySelectorAll("input[type='checkbox']:checked")]
+        .map((input) => input.value);
+
+      return checkedIds
+        .map((id) => state.students.find((student) => student.id === id))
+        .filter(Boolean);
+    }
+
+    async function markAttendance() {
+      const attendanceDate = elements.attendanceDate.value;
+      const selectedStudents = getSelectedAttendanceStudents();
+
+      if (!attendanceDate) {
+        showToast("Vui lòng chọn ngày điểm danh.", "error");
+        return;
+      }
+
+      if (!selectedStudents.length) {
+        showToast("Vui lòng chọn ít nhất một học sinh.", "error");
+        return;
+      }
+
+      selectedStudents.forEach((student) => {
+        student.sessions.push({ date: attendanceDate });
+        student.sessions = getSortedSessions(student);
+      });
+
+      saveStudents();
+      renderAll();
+      saveToGoogleSheet(false);
+      showToast("Điểm danh thành công.");
+      await showModal({
+        title: "Điểm danh thành công",
+        message: `Đã cộng 1 buổi cho ${selectedStudents.length} học sinh vào ngày ${formatDate(attendanceDate)}.`,
+        confirmText: "OK",
+        cancelText: ""
+      });
+    }
+
+    function removeLatestSession(student) {
+      const sortedRefs = sortSessionRefs(student.sessions || []);
+      const latestRef = sortedRefs[sortedRefs.length - 1];
+      if (!latestRef) return null;
+
+      student.sessions = student.sessions.filter((_, index) => index !== latestRef.index);
+      student.sessions = getSortedSessions(student);
+      return latestRef.session;
+    }
+
+    function setStudentSessionCount(student, targetCount) {
+      const currentCount = getSessionCount(student);
+      if (targetCount === currentCount) return { added: 0, removed: [] };
+
+      if (targetCount < currentCount) {
+        const sortedRefs = sortSessionRefs(student.sessions || []);
+        const keptIndexes = new Set(sortedRefs.slice(0, targetCount).map((item) => item.index));
+        const removed = sortedRefs.slice(targetCount).map((item) => item.session);
+        student.sessions = sortSessionRefs((student.sessions || []).filter((_, index) => keptIndexes.has(index))).map((item) => item.session);
+        return { added: 0, removed };
+      }
+
+      const addedCount = targetCount - currentCount;
+      const addedSessions = Array.from({ length: addedCount }, () => ({ date: todayISO() }));
+      student.sessions = getSortedSessions({ ...student, sessions: [...(student.sessions || []), ...addedSessions] });
+      return { added: addedCount, removed: [] };
+    }
+
+    async function rollbackAttendance() {
+      const selectedStudents = getSelectedAttendanceStudents();
+
+      if (!selectedStudents.length) {
+        showToast("Vui lòng chọn học sinh cần lùi buổi.", "error");
+        return;
+      }
+
+      const rollbackableStudents = selectedStudents.filter((student) => getSessionCount(student) > 0);
+      if (!rollbackableStudents.length) {
+        showToast("Các học sinh được chọn chưa có buổi học để lùi.", "error");
+        return;
+      }
+
+      const confirmed = await showModal({
+        title: "Xác nhận lùi buổi",
+        message: `Trừ 1 buổi gần nhất cho ${rollbackableStudents.length} học sinh đã chọn?`,
+        confirmText: "Lùi buổi",
+        cancelText: "Hủy",
+        danger: true
+      });
+
+      if (!confirmed) return;
+
+      const removed = rollbackableStudents.map((student) => ({
+        student,
+        session: removeLatestSession(student)
+      })).filter((item) => item.session);
+
+      saveStudents();
+      renderAll();
+      saveToGoogleSheet(false);
+      showToast(`Bạn đã trừ 1 buổi cho ${removed.length} học sinh.`);
+      await showModal({
+        title: "Đã lùi buổi",
+        message: removed.map((item) => `Bạn đã trừ 1 buổi học sinh ${item.student.name} (${formatDate(item.session.date)}).`).join("\n"),
+        confirmText: "OK",
+        cancelText: ""
+      });
+    }
+
+    function toggleSelectAllAttendance() {
+      const checkboxes = [...elements.attendanceList.querySelectorAll("input[type='checkbox']")];
+      const shouldCheck = checkboxes.some((checkbox) => !checkbox.checked);
+      checkboxes.forEach((checkbox) => {
+        checkbox.checked = shouldCheck;
+      });
+      elements.selectAllAttendance.innerHTML = shouldCheck
+        ? `<i class="fa-solid fa-square-xmark"></i> Bỏ chọn tất cả`
+        : `<i class="fa-solid fa-check-double"></i> Chọn tất cả`;
+    }
+
+    /* =========================
+       Chức năng thanh toán
+       ========================= */
+    function removeOldestSessions(student, paymentCount) {
+      const sortedRefs = sortSessionRefs(student.sessions);
+      const removedIndexes = new Set(sortedRefs.slice(0, paymentCount).map((item) => item.index));
+      student.sessions = sortSessionRefs(student.sessions.filter((_, index) => !removedIndexes.has(index))).map((item) => item.session);
+      return sortedRefs.slice(0, paymentCount).map((item) => item.session);
+    }
+
+    async function payStudent() {
+      const student = state.students.find((item) => item.id === elements.paymentStudent.value);
+      if (!student) {
+        showToast("Vui lòng chọn học sinh cần thanh toán.", "error");
+        return;
+      }
+
+      const currentCount = getSessionCount(student);
+      const paymentCount = parsePositiveInteger(elements.paymentCount.value, 0);
+      const paymentAmount = parseMoney(elements.paymentAmount.value);
+      if (currentCount === 0) {
+        showToast("Học sinh này chưa có buổi học để thanh toán.", "error");
+        return;
+      }
+
+      if (!paymentCount) {
+        showToast("Vui lòng nhập số buổi cần thanh toán.", "error");
+        return;
+      }
+
+      if (paymentCount > currentCount) {
+        showToast("Số buổi thanh toán không được lớn hơn tổng số buổi hiện tại.", "error");
+        return;
+      }
+
+      if (paymentAmount <= 0) {
+        showToast("Vui lòng nhập số tiền học sinh trả.", "error");
+        return;
+      }
+
+      const remaining = Math.max(currentCount - paymentCount, 0);
+      const sessionsToRemove = getSortedSessions(student).slice(0, paymentCount);
+      const confirmed = await showModal({
+        title: "Xác nhận thanh toán",
+        message: `${student.name} hiện có ${currentCount} buổi.\nHệ thống sẽ xoá ${paymentCount} buổi cũ nhất:\n${sessionsToRemove.map((session) => `- ${formatDate(session.date)}`).join("\n")}\n\nSố tiền thu: ${formatMoney(paymentAmount)}.\nSau thanh toán còn ${remaining} buổi.`,
+        confirmText: "Thanh toán",
+        cancelText: "Hủy",
+        danger: false
+      });
+
+      if (!confirmed) return;
+
+      removeOldestSessions(student, paymentCount);
+      state.finance.transactions.push({
+        id: makeId(),
+        type: "income",
+        category: "Học phí",
+        amount: paymentAmount,
+        date: todayISO(),
+        studentId: student.id,
+        studentName: student.name,
+        note: `${paymentCount} buổi`
+      });
+      elements.paymentAmount.value = "";
+      saveStudents();
+      renderAll();
+      showToast("Đã cập nhật thanh toán.");
+    }
+
+    /* =========================
+       Chức năng quản lý học sinh
+       ========================= */
+    async function handleManagerAction(event) {
+      const button = event.target.closest("[data-manage-action]");
+      if (!button) return;
+
+      const action = button.dataset.manageAction;
+      const student = state.students.find((item) => item.id === button.dataset.id);
+      if (!student) return;
+      let shouldSyncSheet = false;
+
+      if (action === "edit-name") {
+        const nextName = await showInputModal({
+          title: "Sửa tên học sinh",
+          label: "Tên học sinh",
+          value: student.name
+        });
+        if (nextName === null) return;
+        if (!nextName) {
+          showToast("Tên học sinh không được để trống.", "error");
+          return;
+        }
+        const duplicated = state.students.some((item) => item.id !== student.id && normalizeNameKey(item.name) === normalizeNameKey(nextName));
+        if (duplicated) {
+          showToast("Tên học sinh này đã tồn tại.", "error");
+          return;
+        }
+        student.name = nextName;
+      }
+
+      if (action === "edit-subject") {
+        const nextSubject = await showInputModal({
+          title: "Sửa bộ môn",
+          label: "Bộ môn",
+          value: student.subject
+        });
+        if (nextSubject === null) return;
+        if (!nextSubject) {
+          showToast("Bộ môn không được để trống.", "error");
+          return;
+        }
+        student.subject = nextSubject;
+      }
+
+      if (action === "edit-standard") {
+        const nextStandard = await showInputModal({
+          title: "Sửa số buổi tiêu chuẩn",
+          label: "Số buổi tiêu chuẩn",
+          value: getStandardSessions(student),
+          type: "number",
+          min: "1"
+        });
+        if (nextStandard === null) return;
+        const parsedStandard = parsePositiveInteger(nextStandard, 0);
+        if (!parsedStandard) {
+          showToast("Số buổi tiêu chuẩn phải lớn hơn 0.", "error");
+          return;
+        }
+        student.standardSessions = parsedStandard;
+      }
+
+      if (action === "edit-sessions") {
+        const nextCount = await showInputModal({
+          title: "Sửa số buổi đã học",
+          label: "Số buổi đã học",
+          value: getSessionCount(student),
+          type: "number",
+          min: "0"
+        });
+        if (nextCount === null) return;
+        const parsedCount = parseNonNegativeInteger(nextCount, -1);
+        if (parsedCount < 0) {
+          showToast("Số buổi đã học không được âm.", "error");
+          return;
+        }
+
+        const result = setStudentSessionCount(student, parsedCount);
+        shouldSyncSheet = true;
+        if (result.removed.length) {
+          showToast(`Đã xoá ${result.removed.length} buổi dư gần nhất.`);
+        } else if (result.added) {
+          showToast(`Đã thêm ${result.added} buổi mới vào ngày ${formatDate(todayISO())}.`);
+        }
+      }
+
+      if (action === "delete") {
+        const confirmed = await showModal({
+          title: "Xoá học sinh",
+          message: `Bạn chắc chắn muốn xoá ${student.name}? Dữ liệu buổi học của học sinh này cũng sẽ bị xoá.`,
+          confirmText: "Xoá học sinh",
+          cancelText: "Hủy",
+          danger: true
+        });
+        if (!confirmed) return;
+        state.students = state.students.filter((item) => item.id !== student.id);
+      }
+
+      saveStudents();
+      renderAll();
+      if (shouldSyncSheet) saveToGoogleSheet(false);
+      showToast("Đã cập nhật danh sách học sinh.");
+    }
+
+    async function addSubject() {
+      const subject = await showInputModal({
+        title: "Thêm bộ môn",
+        label: "Tên bộ môn",
+        value: ""
+      });
+
+      if (subject === null) return;
+      if (!subject) {
+        showToast("Tên bộ môn không được để trống.", "error");
+        return;
+      }
+
+      const existed = state.settings.subjects.some((item) => normalizeText(item) === normalizeText(subject));
+      if (existed) {
+        showToast("Bộ môn này đã tồn tại.", "error");
+        return;
+      }
+
+      state.settings.subjects.push(subject);
+      state.settings.subjects = normalizeList(state.settings.subjects, DEFAULT_SUBJECTS);
+      saveAppData();
+      renderAll();
+      elements.studentSubject.value = subject;
+      showToast("Đã thêm bộ môn.");
+    }
+
+    async function addExpenseCategory() {
+      const category = await showInputModal({
+        title: "Thêm mục chi",
+        label: "Tên mục chi",
+        value: ""
+      });
+
+      if (category === null) return;
+      if (!category) {
+        showToast("Tên mục chi không được để trống.", "error");
+        return;
+      }
+
+      const existed = state.settings.expenseCategories.some((item) => normalizeText(item) === normalizeText(category));
+      if (existed) {
+        showToast("Mục chi này đã tồn tại.", "error");
+        return;
+      }
+
+      state.settings.expenseCategories.push(category);
+      state.settings.expenseCategories = normalizeList(state.settings.expenseCategories, DEFAULT_EXPENSE_CATEGORIES);
+      saveAppData();
+      renderAll();
+      elements.expenseCategory.value = category;
+      showToast("Đã thêm mục chi.");
+    }
+
+    function addExpense() {
+      const category = elements.expenseCategory.value;
+      const amount = parseMoney(elements.expenseAmount.value);
+      const date = elements.expenseDate.value || todayISO();
+
+      if (!category) {
+        showToast("Vui lòng chọn mục chi.", "error");
+        return;
+      }
+
+      if (amount <= 0) {
+        showToast("Vui lòng nhập số tiền chi.", "error");
+        return;
+      }
+
+      state.finance.transactions.push({
+        id: makeId(),
+        type: "expense",
+        category,
+        amount,
+        date,
+        studentId: "",
+        studentName: "",
+        note: category
+      });
+      elements.expenseAmount.value = "";
+      saveAppData();
+      renderAll();
+      showToast("Đã thêm khoản chi.");
+    }
+
+    /* =========================
+       Backup JSON và Auto Backup
+       ========================= */
+    function downloadFile(filename, content, mimeType) {
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function validateAppDataForImport(rawData) {
+      try {
+        const normalized = normalizeAppData(rawData);
+        if (!Array.isArray(normalized.students) || !normalized.students.length) {
+          return { ok: false, message: "File backup không có danh sách học sinh hợp lệ." };
+        }
+
+        const duplicated = [];
+        const seen = new Set();
+        normalized.students.forEach((student) => {
+          const key = normalizeNameKey(student.name);
+          if (seen.has(key)) duplicated.push(student.name);
+          seen.add(key);
+        });
+
+        if (duplicated.length) {
+          return {
+            ok: false,
+            message: `File backup có tên học sinh bị trùng:\n${[...new Set(duplicated)].map((name) => `- ${name}`).join("\n")}`
+          };
+        }
+
+        return { ok: true, data: normalized };
+      } catch (error) {
+        return { ok: false, message: "File backup không đúng cấu trúc dữ liệu." };
+      }
+    }
+
+    function exportBackupJson() {
+      showLoading(650);
+      state.lastBackup = new Date().toISOString();
+      const exportData = {
+        ...buildAppData(),
+        exportedAt: new Date().toISOString()
+      };
+      downloadFile(
+        `quan-ly-hoc-sinh-backup_${todayISO()}.json`,
+        JSON.stringify(exportData, null, 2),
+        "application/json"
+      );
+      saveAppData();
+      renderBackupStatus();
+      showToast("Đã export backup JSON.");
+    }
+
+    async function importBackupJson(file) {
+      if (!file) return;
+      showLoading(900);
+
+      try {
+        const rawText = await file.text();
+        const parsed = JSON.parse(rawText);
+        const validation = validateAppDataForImport(parsed);
+
+        if (!validation.ok) {
+          await showModal({
+            title: "Không thể import backup",
+            message: validation.message,
+            confirmText: "Đã hiểu",
+            cancelText: ""
+          });
+          return;
+        }
+
+        const confirmed = await showModal({
+          title: "Xác nhận import backup JSON",
+          message: `File backup chứa ${validation.data.students.length} học sinh.\nDữ liệu hiện tại sẽ được thay thế bằng dữ liệu trong file backup.`,
+          confirmText: "Import backup",
+          cancelText: "Hủy"
+        });
+
+        if (!confirmed) return;
+
+        applyAppData(validation.data);
+        saveAppData();
+        renderAll();
+        showToast("Đã import backup JSON thành công.");
+      } catch (error) {
+        console.error(error);
+        await showModal({
+          title: "Lỗi import backup",
+          message: "Không thể đọc file JSON này. Vui lòng kiểm tra lại file backup.",
+          confirmText: "Đã hiểu",
+          cancelText: ""
+        });
+      } finally {
+        elements.jsonFileInput.value = "";
+      }
+    }
+
+    function performAutoBackup({ notify = false } = {}) {
+      const now = new Date().toISOString();
+      state.lastBackup = now;
+      state.autoBackup = {
+        lastBackup: now,
+        data: {
+          ...buildBackupPayload(),
+          lastBackup: now,
+          backupType: "auto"
+        }
+      };
+      saveAppData();
+      renderBackupStatus();
+      if (notify) showToast("Đã tạo auto backup.");
+    }
+
+    async function restoreLatestBackup() {
+      const latestBackup = state.autoBackup?.data;
+      if (!latestBackup) {
+        showToast("Chưa có bản auto backup để khôi phục.", "error");
+        return;
+      }
+
+      const validation = validateAppDataForImport(latestBackup);
+      if (!validation.ok) {
+        await showModal({
+          title: "Không thể khôi phục",
+          message: validation.message,
+          confirmText: "Đã hiểu",
+          cancelText: ""
+        });
+        return;
+      }
+
+      const confirmed = await showModal({
+        title: "Khôi phục dữ liệu gần nhất",
+        message: `Khôi phục bản backup lúc ${formatDateTime(state.autoBackup.lastBackup)}?\nDữ liệu hiện tại sẽ được thay thế bằng bản backup này.`,
+        confirmText: "Khôi phục",
+        cancelText: "Hủy"
+      });
+
+      if (!confirmed) return;
+
+      applyAppData(validation.data, { preserveAutoBackup: true });
+      saveAppData();
+      renderAll();
+      showToast("Đã khôi phục dữ liệu từ bản backup gần nhất.");
+    }
+
+    function startAutoBackup() {
+      if (!state.autoBackup?.data) {
+        performAutoBackup();
+      } else {
+        renderBackupStatus();
+      }
+      window.setInterval(() => performAutoBackup(), AUTO_BACKUP_INTERVAL_MS);
+    }
+
+    /* =========================
+       Đồng bộ Google Sheet qua Apps Script
+       ========================= */
+    function getGoogleScriptUrl() {
+      return GOOGLE_SCRIPT_URL;
+    }
+
+    function markRemoteDirty() {
+      state.remoteDirty = true;
+    }
+
+    async function saveToGoogleSheet(showResult = true) {
+      const scriptUrl = getGoogleScriptUrl();
+      if (state.remoteSyncing) return false;
+
+      try {
+        state.remoteSyncing = true;
+        await fetch(scriptUrl, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            action: "save",
+            sheetId: GOOGLE_SHEET_ID,
+            data: buildAppData()
+          })
+        });
+        state.remoteDirty = false;
+        if (showResult) showToast("Đã gửi dữ liệu lên Google Sheet.");
+        return true;
+      } catch (error) {
+        console.error(error);
+        if (showResult) showToast("Không thể gửi dữ liệu lên Google Sheet.", "error");
+        return false;
+      } finally {
+        state.remoteSyncing = false;
+      }
+    }
+
+    function loadFromGoogleSheetJsonp() {
+      return new Promise((resolve, reject) => {
+        const scriptUrl = getGoogleScriptUrl();
+        const callbackName = `qlhsSheetCallback_${Date.now()}`;
+        const script = document.createElement("script");
+        const separator = scriptUrl.includes("?") ? "&" : "?";
+        const timeout = window.setTimeout(() => {
+          cleanup();
+          reject(new Error("Google Sheet response timeout"));
+        }, 12000);
+
+        function cleanup() {
+          window.clearTimeout(timeout);
+          script.remove();
+          delete window[callbackName];
+        }
+
+        window[callbackName] = (payload) => {
+          cleanup();
+          resolve(payload?.data || payload);
+        };
+
+        script.onerror = () => {
+          cleanup();
+          reject(new Error("Không tải được dữ liệu Google Sheet"));
+        };
+
+        script.src = `${scriptUrl}${separator}action=load&sheetId=${encodeURIComponent(GOOGLE_SHEET_ID)}&callback=${encodeURIComponent(callbackName)}`;
+        document.body.appendChild(script);
+      });
+    }
+
+    async function loadFromGoogleSheet() {
+      const scriptUrl = getGoogleScriptUrl();
+
+      showLoading(900);
+      try {
+        const remoteData = await loadFromGoogleSheetJsonp();
+        const validation = validateAppDataForImport(remoteData);
+        if (!validation.ok) {
+          await showModal({
+            title: "Không thể đọc Google Sheet",
+            message: validation.message,
+            confirmText: "Đã hiểu",
+            cancelText: ""
+          });
+          return false;
+        }
+
+        applyAppData(validation.data);
+        saveAppData();
+        state.remoteDirty = false;
+        renderAll();
+        showToast("Đã lấy dữ liệu từ Google Sheet.");
+        return true;
+      } catch (error) {
+        console.error(error);
+        showToast("Không thể lấy dữ liệu từ Google Sheet.", "error");
+        return false;
+      }
+    }
+
+    async function syncGoogleSheet() {
+      const mode = await showChoiceModal({
+        title: "Đồng bộ Google Sheet",
+        message: "Chọn hướng đồng bộ dữ liệu.",
+        choices: [
+          {
+            value: "pull",
+            label: "Lấy từ Sheet",
+            description: "Dùng Google Sheet làm nguồn dữ liệu hiện tại.",
+            icon: "fa-cloud-arrow-down"
+          },
+          {
+            value: "push",
+            label: "Lưu lên Sheet",
+            description: "Gửi dữ liệu hiện tại của app lên Google Sheet.",
+            icon: "fa-cloud-arrow-up"
+          }
+        ]
+      });
+
+      if (mode === "pull") await loadFromGoogleSheet();
+      if (mode === "push") await saveToGoogleSheet(true);
+    }
+
+    function startGoogleSheetAutoSync() {
+      window.setInterval(() => {
+        if (!state.remoteSyncPaused) {
+          saveToGoogleSheet(false);
+        }
+      }, GOOGLE_SYNC_INTERVAL_MS);
+    }
+
+    /* =========================
+       Export Excel bằng SheetJS
+       ========================= */
+    function ensureSheetJS() {
+      if (typeof XLSX === "undefined") {
+        showToast("Không tải được thư viện SheetJS CDN.", "error");
+        return false;
+      }
+      return true;
+    }
+
+    function exportExcel() {
+      if (!ensureSheetJS()) return;
+      showLoading(760);
+
+      const maxSessions = Math.max(1, ...state.students.map((student) => getSessionCount(student)));
+      const headers = [
+        "Tên",
+        "Bộ môn",
+        "Số buổi tiêu chuẩn",
+        ...Array.from({ length: maxSessions }, (_, index) => `Ngày học ${index + 1}`)
+      ];
+
+      const rows = sortStudents(state.students).map((student) => {
+        const sessions = getSortedSessions(student);
+        return [
+          student.name,
+          student.subject,
+          getStandardSessions(student),
+          ...Array.from({ length: maxSessions }, (_, index) => sessions[index] ? formatDate(sessions[index].date) : "")
+        ];
+      });
+
+      const mainSheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+      mainSheet["!cols"] = [
+        { wch: 26 },
+        { wch: 18 },
+        { wch: 18 },
+        ...Array.from({ length: maxSessions }, () => ({ wch: 12 }))
+      ];
+
+      const dataSheet = XLSX.utils.aoa_to_sheet([
+        ["QLHS_DATA_V2"],
+        [JSON.stringify(state.students)]
+      ]);
+
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, mainSheet, "Danh sách");
+      XLSX.utils.book_append_sheet(workbook, dataSheet, "__QLHS_DATA__");
+      workbook.Workbook = {
+        Sheets: [
+          { name: "Danh sách", Hidden: 0 },
+          { name: "__QLHS_DATA__", Hidden: 1 }
+        ]
+      };
+
+      XLSX.writeFile(workbook, `quan-ly-hoc-sinh_${todayISO()}.xlsx`);
+      showToast("Đã export Excel thành công.");
+    }
+
+    /* =========================
+       Import Excel bằng SheetJS
+       ========================= */
+    function toISODate(year, month, day) {
+      const yyyy = String(year).padStart(4, "0");
+      const mm = String(month).padStart(2, "0");
+      const dd = String(day).padStart(2, "0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function parseExcelDateCell(value) {
+      if (value instanceof Date && !Number.isNaN(value.getTime())) {
+        return toISODate(value.getFullYear(), value.getMonth() + 1, value.getDate());
+      }
+
+      if (typeof value === "number" && typeof XLSX !== "undefined" && XLSX.SSF?.parse_date_code) {
+        const parsed = XLSX.SSF.parse_date_code(value);
+        if (parsed) return toISODate(parsed.y, parsed.m, parsed.d);
+      }
+
+      const text = String(value || "").trim();
+      if (!text) return "";
+      if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return text;
+
+      const slashMatch = text.match(/^(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?$/);
+      if (slashMatch) {
+        const day = Number(slashMatch[1]);
+        const month = Number(slashMatch[2]);
+        const yearText = slashMatch[3];
+        const currentYear = new Date().getFullYear();
+        const year = yearText ? Number(yearText.length === 2 ? `20${yearText}` : yearText) : currentYear;
+        if (day >= 1 && day <= 31 && month >= 1 && month <= 12) {
+          return toISODate(year, month, day);
+        }
+      }
+
+      return "";
+    }
+
+    function parseWorkbook(workbook) {
+      const hiddenSheet = workbook.Sheets["__QLHS_DATA__"];
+      const storedJson = hiddenSheet?.A2?.v;
+
+      if (storedJson) {
+        try {
+          const parsed = JSON.parse(storedJson);
+          if (Array.isArray(parsed)) {
+            return parsed.map(normalizeStudent).filter((student) => student.name && student.subject);
+          }
+        } catch (error) {
+          console.warn("Không đọc được sheet dữ liệu ẩn, chuyển sang đọc bảng Excel.", error);
+        }
+      }
+
+      const firstSheetName = workbook.SheetNames[0];
+      const firstSheet = workbook.Sheets[firstSheetName];
+      const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: "", raw: true });
+      const headers = (rows[0] || []).map((cell) => normalizeText(cell));
+      const standardIndex = headers.findIndex((header) => header.includes("so buoi tieu chuan"));
+      const sessionStartIndex = standardIndex >= 0 ? standardIndex + 1 : 2;
+      const dataRows = rows.slice(1);
+      const timestamp = Date.now();
+
+      return dataRows
+        .filter((row) => String(row[0] || "").trim())
+        .map((row, rowIndex) => {
+          const sessionCells = row.slice(sessionStartIndex);
+          const sessions = sessionCells
+            .map((cell, cellIndex) => {
+              const parsedDate = parseExcelDateCell(cell);
+              if (parsedDate) return { date: parsedDate };
+              return String(cell).trim().toUpperCase() === "X"
+                ? { date: `imported-${timestamp}-${rowIndex + 1}-${cellIndex + 1}` }
+                : null;
+            })
+            .filter(Boolean);
+
+          return {
+            id: makeId(),
+            name: String(row[0] || "").trim(),
+            subject: String(row[1] || "").trim() || "Chưa có bộ môn",
+            standardSessions: standardIndex >= 0 ? parseNonNegativeInteger(row[standardIndex], DEFAULT_STANDARD_SESSIONS) : DEFAULT_STANDARD_SESSIONS,
+            sessions
+          };
+        })
+        .map(normalizeStudent);
+    }
+
+    function validateImportedStudents(importedStudents) {
+      if (!importedStudents.length) {
+        return "File Excel không có dữ liệu học sinh.";
+      }
+
+      const seen = new Set();
+      const duplicated = [];
+      importedStudents.forEach((student) => {
+        const key = normalizeNameKey(student.name);
+        if (seen.has(key)) duplicated.push(student.name);
+        seen.add(key);
+      });
+
+      if (duplicated.length) {
+        return `File Excel có tên học sinh bị trùng:\n${[...new Set(duplicated)].map((name) => `- ${name}`).join("\n")}`;
+      }
+
+      return "";
+    }
+
+    function mergeStudents(existingStudents, importedStudents) {
+      const mergedMap = new Map(existingStudents.map((student) => [normalizeNameKey(student.name), { ...student }]));
+
+      importedStudents.forEach((importedStudent) => {
+        const key = normalizeNameKey(importedStudent.name);
+        const existingStudent = mergedMap.get(key);
+        mergedMap.set(key, {
+          ...(existingStudent || {}),
+          ...importedStudent,
+          id: existingStudent?.id || importedStudent.id || makeId(),
+          sessions: getSortedSessions(importedStudent)
+        });
+      });
+
+      return sortStudents([...mergedMap.values()].map(normalizeStudent));
+    }
+
+    async function importExcel(file) {
+      if (!file || !ensureSheetJS()) return;
+      showLoading(900);
+
+      try {
+        const buffer = await file.arrayBuffer();
+        const workbook = XLSX.read(buffer, { type: "array", cellDates: true });
+        const importedStudents = parseWorkbook(workbook);
+        const validationError = validateImportedStudents(importedStudents);
+
+        if (validationError) {
+          await showModal({
+            title: "Không thể import",
+            message: validationError,
+            confirmText: "Đã hiểu",
+            cancelText: ""
+          });
+          return;
+        }
+
+        const importMode = await showChoiceModal({
+          title: "Xác nhận import Excel",
+          message: `File ${file.name} có ${importedStudents.length} học sinh. Bạn muốn xử lý dữ liệu như thế nào?`,
+          choices: [
+            {
+              value: "merge",
+              label: "Gộp dữ liệu",
+              description: "Không tạo trùng; trùng tên thì cập nhật dữ liệu.",
+              icon: "fa-code-merge"
+            },
+            {
+              value: "replace",
+              label: "Thay thế dữ liệu cũ",
+              description: "Xoá dữ liệu hiện tại và import mới hoàn toàn.",
+              icon: "fa-arrows-rotate"
+            }
+          ]
+        });
+
+        if (!importMode) return;
+
+        state.students = importMode === "merge"
+          ? mergeStudents(state.students, importedStudents)
+          : importedStudents;
+        saveStudents();
+        renderAll();
+        showToast(importMode === "merge" ? "Đã gộp dữ liệu Excel thành công." : "Đã thay thế dữ liệu từ Excel.");
+      } catch (error) {
+        console.error(error);
+        await showModal({
+          title: "Lỗi import Excel",
+          message: "Không thể đọc file Excel này. Vui lòng kiểm tra lại cấu trúc cột.",
+          confirmText: "Đã hiểu",
+          cancelText: ""
+        });
+      } finally {
+        elements.excelFileInput.value = "";
+      }
+    }
+
+    /* =========================
+       Gắn sự kiện và khởi tạo app
+       ========================= */
+    function bindEvents() {
+      document.querySelectorAll("[data-view]").forEach((button) => {
+        button.addEventListener("click", () => showView(button.dataset.view));
+      });
+
+      elements.globalSearch.addEventListener("input", (event) => {
+        state.searchTerm = normalizeText(event.target.value);
+        renderStudentTable();
+        renderAttendanceList();
+        renderProgressTable();
+      });
+
+      elements.quickDarkToggle.addEventListener("click", toggleTheme);
+      elements.themeCardBtn.addEventListener("click", toggleTheme);
+      elements.addStudentForm.addEventListener("submit", addStudent);
+      elements.bulkAddStudentForm.addEventListener("submit", addBulkStudents);
+      elements.attendanceSearch.addEventListener("input", (event) => {
+        state.attendanceSearchTerm = normalizeText(event.target.value);
+        renderAttendanceList();
+      });
+      elements.attendanceSubjectFilter.addEventListener("change", (event) => {
+        state.attendanceSubjectFilter = event.target.value;
+        renderAttendanceList();
+      });
+      elements.selectAllAttendance.addEventListener("click", toggleSelectAllAttendance);
+      elements.markAttendanceBtn.addEventListener("click", markAttendance);
+      elements.rollbackAttendanceBtn.addEventListener("click", rollbackAttendance);
+      elements.attendanceSyncBtn.addEventListener("click", () => saveToGoogleSheet(true));
+      elements.paymentStudent.addEventListener("change", setDefaultPaymentCount);
+      elements.paymentCount.addEventListener("input", updatePaymentPreview);
+      elements.paymentAmount.addEventListener("input", updatePaymentPreview);
+      elements.payBtn.addEventListener("click", payStudent);
+      elements.addSubjectBtn.addEventListener("click", addSubject);
+      elements.addExpenseBtn.addEventListener("click", addExpense);
+      elements.addExpenseCategoryBtn.addEventListener("click", addExpenseCategory);
+      elements.managerSearch.addEventListener("input", (event) => {
+        state.managerSearchTerm = normalizeText(event.target.value);
+        renderManagerTable();
+      });
+      elements.subjectFilter.addEventListener("change", (event) => {
+        state.managerSubjectFilter = event.target.value;
+        renderManagerTable();
+      });
+      elements.managerTableBody.addEventListener("click", handleManagerAction);
+      elements.exportExcelBtn.addEventListener("click", exportExcel);
+      elements.importExcelBtn.addEventListener("click", () => elements.excelFileInput.click());
+      elements.syncSheetBtn.addEventListener("click", () => saveToGoogleSheet(true));
+      elements.exportJsonBtn.addEventListener("click", exportBackupJson);
+      elements.importJsonBtn.addEventListener("click", () => elements.jsonFileInput.click());
+      elements.restoreBackupBtn.addEventListener("click", restoreLatestBackup);
+      elements.excelFileInput.addEventListener("change", (event) => importExcel(event.target.files[0]));
+      elements.jsonFileInput.addEventListener("change", (event) => importBackupJson(event.target.files[0]));
+    }
+
+    function init() {
+      elements.todayLabel.textContent = formatDate(todayISO());
+      elements.attendanceDate.value = todayISO();
+      elements.expenseDate.value = todayISO();
+      state.remoteSyncPaused = true;
+      loadStudents();
+      state.remoteSyncPaused = false;
+      applyTheme(state.settings.theme, false);
+      bindEvents();
+      renderAll();
+      startAutoBackup();
+      startGoogleSheetAutoSync();
+      window.setTimeout(() => loadFromGoogleSheet(), 300);
+    }
+
+    init();
+  </script>
+</body>
+</html>
